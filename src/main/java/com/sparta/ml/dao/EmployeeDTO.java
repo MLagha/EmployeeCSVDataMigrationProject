@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 // Emp ID, Name Prefix, First Name, Middle Initial, Last Name, Gender, E Mail, Date of Birth, Date of Joining, Salary
 //198429, Mrs.,
 public class EmployeeDTO {
-    private String empID;
     private String namePrefix;
     private String firstName;
     private String middleInitial;
@@ -18,8 +17,7 @@ public class EmployeeDTO {
     private Float salary;
 
     //09/07/2000
-    public EmployeeDTO(String empID, String namePrefix, String firstName, String middleInitial, String lastName, String gender, String email, String dateOfBirth, String dateOfJoining, String salary) {
-        this.empID = empID;
+    public EmployeeDTO(String namePrefix, String firstName, String middleInitial, String lastName, String gender, String email, String dateOfBirth, String dateOfJoining, String salary) {
         this.namePrefix = namePrefix;
         this.firstName = firstName;
         this.middleInitial = middleInitial;
@@ -33,7 +31,6 @@ public class EmployeeDTO {
 
     public EmployeeDTO(String[] csvInput) {
         new EmployeeDTO (
-                csvInput[0],
                 csvInput[1],
                 csvInput[2],
                 csvInput[3],
@@ -44,10 +41,6 @@ public class EmployeeDTO {
                 csvInput[8],
                 csvInput[9]
         );
-    }
-
-    public String getEmpID() {
-        return empID;
     }
 
     public String getNamePrefix() {

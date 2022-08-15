@@ -5,28 +5,45 @@ import com.sparta.ml.dao.EmployeeDTO;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //Data Access Object
 //CRUD
 public class EmployeeDAO {
-    private static ArrayList<EmployeeDTO> employees = new ArrayList<EmployeeDTO>();
+    private static final Logger logger = Logger.getLogger("my logger");
+    private static ConsoleHandler consoleHandler = new ConsoleHandler();
+    private static Map<String, EmployeeDTO> employeesMap = new HashMap<>();
     private static BufferedReader bufferedReader;
 
-    public static ArrayList<EmployeeDTO> getEmployees() {
-        return employees;
+    public static Map<String, EmployeeDTO> getEmployeesMap() {
+        return employeesMap;
     }
-    public static void populatedArray(String filename) {
-            try {
+
+    public static void populateHashMap(String filename) {
+        consoleHandler.setLevel(Level.INFO);
+        logger.log(Level.INFO, "populateHashMap method started, filename is " + filename);
+        try {
             var fileReader = new FileReader("src/main/resources/EmployeeRecords.csv");
             bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine();
             String line = bufferedReader.readLine();
-
-            while(line != null) {
-                String[] records = line.split(",");
-                EmployeeDTO employeeDTO = new EmployeeDTO(records);
-                employees.add(employeeDTO);
+            while (line != null) {
+                logger.log(Level.FINE, "While loop for reading csv line started");
+                String[] record = line.split(",");
+                EmployeeDTO employeeDTO = new EmployeeDTO(record);
+                //if no data corruption
+                if (!employeesMap.containsKey(record[0])) {
+                    employeesMap.put(record[0], employeeDTO);
+                    logger.log(Level.FINE,"!employeesMap.containsKey(record[0]), " + Arrays.toString(record) + " added");
+                } else {
+                    logger.log(Level.FINE,"employeesMap.containsKey(record[0]) duplicate found, record is " + Arrays.toString(record));
+                    //put record in duplicate list
+                }
                 line = bufferedReader.readLine();
             }
         } catch (IOException e) {
