@@ -1,5 +1,7 @@
 package com.sparta.ml.dto;
 
+import com.sparta.ml.dao.EmployeeDTO;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,10 +16,10 @@ public class EmployeeDAO {
     public static ArrayList<EmployeeDTO> getEmployees() {
         return employees;
     }
-    public static void PopulatedArray(String filename) {
+    public static void populatedArray(String filename) {
             try {
             var fileReader = new FileReader("src/main/resources/EmployeeRecords.csv");
-            var bufferedReader = new BufferedReader(fileReader);
+            bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine();
             String line = bufferedReader.readLine();
 
