@@ -3,34 +3,40 @@ package com.sparta.ml.dto;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-// Emp ID, Name Prefix, First Name, Middle Initial, Last Name, Gender, E Mail, Date of Birth, Date of Joining, Salary
+//Storing of Employee Data:
+
+//Data Transfer Object: Responsible for pulling the data --> packing it in an object --> providing you getters to get hold of those values
+//Read correct Type then convert constructor
+
+//Emp ID, Name Prefix, First Name, Middle Initial, Last Name, Gender, E Mail, Date of Birth, Date of Joining, Salary
 //198429, Mrs.,
 public class EmployeeDTO {
     private String empID;
     private String namePrefix;
     private String firstName;
     private String middleInitial;
-    private String LastName;
+    private String lastName;
     private String gender; //private char gender
     private String email;
     private LocalDate dateOfBirth;
     private LocalDate dateOfJoining;
     private Float salary;
 
-    //09/07/2000
-    public EmployeeDTO(String empID, String namePrefix, String firstName, String middleInitial, String lastName, String gender, String email, String dateOfBirth, String dateOfJoining, String salary) {
-        this.empID = empID;
-        this.namePrefix = namePrefix;
-        this.firstName = firstName;
-        this.middleInitial = middleInitial;
-        this.LastName = lastName;
-        this.gender = gender;
-        this.email = email;
-        this.dateOfBirth = LocalDate.parse(dateOfBirth, DateTimeFormatter.ofPattern("M/d/uuuu"));
-        this.dateOfJoining = LocalDate.parse(dateOfJoining, DateTimeFormatter.ofPattern("M/d/uuuu"));
-        this.salary = Float.valueOf(salary);
+    public EmployeeDTO(String [] csvInput) {
+        this.empID = csvInput[0];
+        this.namePrefix = csvInput[1];
+        this.firstName = csvInput[2];
+        this.middleInitial = csvInput[3];
+        this.lastName = csvInput[4];
+        this.gender = csvInput[5];
+        this.email = csvInput[6];
+        this.dateOfBirth = LocalDate.parse(csvInput[7], DateTimeFormatter.ofPattern("M/d/uuuu"));
+        this.dateOfJoining = LocalDate.parse(csvInput[8], DateTimeFormatter.ofPattern("M/d/uuuu"));
+        this.salary = Float.valueOf(csvInput[9]);
     }
 
+    /* Constructor doesn't work!!
+    //replace with HashMap
     public EmployeeDTO(String[] csvInput) {
         new EmployeeDTO (
                 csvInput[0],
@@ -45,6 +51,7 @@ public class EmployeeDTO {
                 csvInput[9]
         );
     }
+     */
 
     public String getEmpID() {
         return empID;
@@ -63,7 +70,7 @@ public class EmployeeDTO {
     }
 
     public String getLastName() {
-        return LastName;
+        return lastName;
     }
 
     public String getGender() {
@@ -86,18 +93,4 @@ public class EmployeeDTO {
         return salary;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
