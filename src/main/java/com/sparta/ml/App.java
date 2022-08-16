@@ -7,6 +7,8 @@ import java.io.*;
 import java.text.ParseException;
 import java.util.HashMap;
 
+
+//Iteration - Filtering
 public class App {
     private static final EmployeeDAO employeeDAO = new EmployeeDAO();
 
