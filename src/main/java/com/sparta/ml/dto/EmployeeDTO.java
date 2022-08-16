@@ -20,7 +20,9 @@ public class EmployeeDTO {
     private String email;
     private LocalDate dateOfBirth;
     private LocalDate dateOfJoining;
-    private Float salary;
+    private String salary;
+
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M/d/yyyy");
 
     public EmployeeDTO(String [] csvInput) {
         this.empID = csvInput[0];
@@ -37,19 +39,18 @@ public class EmployeeDTO {
 
     /* Constructor doesn't work!!
     //replace with HashMap
+
     public EmployeeDTO(String[] csvInput) {
-        new EmployeeDTO (
-                csvInput[0],
-                csvInput[1],
-                csvInput[2],
-                csvInput[3],
-                csvInput[4],
-                csvInput[5],
-                csvInput[6],
-                csvInput[7],
-                csvInput[8],
-                csvInput[9]
-        );
+        empID = csvInput[0];
+        namePrefix = csvInput[1];
+        firstName = csvInput[2];
+        middleInitial = csvInput[3];
+        lastName = csvInput[4];
+        gender = csvInput[5];
+        email = csvInput[6];
+        dateOfBirth = LocalDate.parse(csvInput[7], dateTimeFormatter);
+        dateOfJoining = LocalDate.parse(csvInput[8], dateTimeFormatter);
+        salary = csvInput[9];
     }
      */
 
@@ -89,8 +90,23 @@ public class EmployeeDTO {
         return dateOfJoining;
     }
 
-    public Float getSalary() {
+    public String getSalary() {
         return salary;
+    }
+
+    @Override
+    public String toString() {
+        return "EmployeeDTO{" +
+                empID + "," +
+                namePrefix + "," +
+                firstName + "," +
+                middleInitial + "," +
+                lastName + "," +
+                gender + "," +
+                email + "," +
+                dateOfBirth + "," +
+                 dateOfJoining + "," +
+                salary + "\n";
     }
 }
 
