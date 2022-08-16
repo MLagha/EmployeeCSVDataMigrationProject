@@ -1,4 +1,6 @@
-package com.sparta.ml.dto;
+package com.sparta.ml.dao;
+
+import com.sparta.ml.dto.EmployeeDTO;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

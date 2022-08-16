@@ -1,6 +1,6 @@
 package com.sparta.ml;
 
-import com.sparta.ml.dto.EmployeeDAO;
+import com.sparta.ml.dao.EmployeeDAO;
 import com.sparta.ml.dto.EmployeeDTO;
 
 import java.io.*;
