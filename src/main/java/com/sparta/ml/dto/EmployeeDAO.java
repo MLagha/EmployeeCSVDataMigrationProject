@@ -5,8 +5,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-//Data Access Object
-//CRUD
 public class EmployeeDAO {
     private static ArrayList<EmployeeDTO> employees = new ArrayList<EmployeeDTO>();
     private static BufferedReader bufferedReader;
