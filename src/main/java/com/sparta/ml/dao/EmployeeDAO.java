@@ -41,22 +41,16 @@ public class EmployeeDAO {
                     try {
                         if (!employeesMap.containsKey(record[0])) {
                             employeesMap.put(record[0], employeeDTO);
-                            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/CleanEntries.csv", true));
-                            bufferedWriter.write(employeeDTO.toString());
-                            bufferedWriter.close();
+                            writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
                         } else {
                             logger.log(Level.FINE, "employeesMap.containsKey(record[0]) duplicate found, record is " + Arrays.toString(record));
-                            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/DuplicateEntries.csv", true));
-                            bufferedWriter.write(employeeDTO.toString());
-                            bufferedWriter.close();
+                            writeToFile("src/main/resources/DuplicateEntries.csv", employeeDTO);
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("src/main/resources/CorruptEntries.csv", true));
-                    bufferedWriter.write(employeeDTO.toString());
-                    bufferedWriter.close();
+                    writeToFile("src/main/resources/CorruptEntries.csv", employeeDTO);
                 }
             }
         } catch (IOException e) {
@@ -64,5 +58,11 @@ public class EmployeeDAO {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void writeToFile(String fileName, EmployeeDTO employeeDTO) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
+        bufferedWriter.write(employeeDTO.toString());
+        bufferedWriter.close();
     }
 }
