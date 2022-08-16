@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 // Emp ID, Name Prefix, First Name, Middle Initial, Last Name, Gender, E Mail, Date of Birth, Date of Joining, Salary
 //198429, Mrs.,
 public class EmployeeDTO {
-    private String empID;
+    private final String empID;
     private String namePrefix;
     private String firstName;
     private String middleInitial;
@@ -15,21 +15,20 @@ public class EmployeeDTO {
     private String email;
     private LocalDate dateOfBirth;
     private LocalDate dateOfJoining;
-    private String salary;
+    private Float salary;
 
     //09/07/2000
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M/d/yyyy");
-    public EmployeeDTO(String[] csvInput) {
-        empID = csvInput[0];
-        namePrefix = csvInput[1];
-        firstName = csvInput[2];
-        middleInitial = csvInput[3];
-        lastName = csvInput[4];
-        gender = csvInput[5];
-        email = csvInput[6];
-        dateOfBirth = LocalDate.parse(csvInput[7], dateTimeFormatter);
-        dateOfJoining = LocalDate.parse(csvInput[8], dateTimeFormatter);
-        salary = csvInput[9];
+    public EmployeeDTO(String [] csvInput) {
+        this.empID = csvInput[0];
+        this.namePrefix = csvInput[1];
+        this.firstName = csvInput[2];
+        this.middleInitial = csvInput[3];
+        this.lastName = csvInput[4];
+        this.gender = csvInput[5];
+        this.email = csvInput[6];
+        this.dateOfBirth = LocalDate.parse(csvInput[7], DateTimeFormatter.ofPattern("M/d/uuuu"));
+        this.dateOfJoining = LocalDate.parse(csvInput[8], DateTimeFormatter.ofPattern("M/d/uuuu"));
+        this.salary = Float.valueOf(csvInput[9]);
     }
 
     public String getEmpID() {
@@ -68,22 +67,21 @@ public class EmployeeDTO {
         return dateOfJoining;
     }
 
-    public String getSalary() {
+    public Float getSalary() {
         return salary;
     }
 
     @Override
     public String toString() {
-        return "EmployeeDTO{" +
-                empID + "," +
-                namePrefix + "," +
-                firstName + "," +
-                middleInitial + "," +
-                lastName + "," +
-                gender + "," +
-                email + "," +
-                dateOfBirth + "," +
-                 dateOfJoining + "," +
-                salary + "\n";
+        return "EmployeeID" + empID +
+                "namePrefix='" +  + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", middleInitial='" + middleInitial + '\'' +
+                ", LastName='" + lastName + '\'' +
+                ", gender='" + gender + '\'' +
+                ", email='" + email + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", dateOfJoining=" + dateOfJoining +
+                ", salary=" + salary + "\n";
     }
 }
