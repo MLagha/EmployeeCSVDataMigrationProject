@@ -10,4 +10,3 @@ public class App {
         System.out.println(EmployeeDAO.getEmployees().get(0).getLastName());
     }
 }
-
