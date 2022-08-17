@@ -42,40 +42,34 @@ public class DataCorruptionChecker {
     private static boolean isTitleCorrupt(String title){
         String[] titles = new String[] {"Prof.", "Mrs.", "Mr.", "Ms.", "Dr.", "Drs.", "Hon."};
         for (String honoraryTitle : titles) {
-            if(honoraryTitle.equals(title)) return true; //checked on Excel to see all possibilities
+            if(honoraryTitle.equals(title)) return true;
         }
         return false;
     }
 
     private static boolean isNameCorrupt(String name){
-        return (name.matches("^[a-zA-Z]*$")); //regex for string char, capital included
+        return (name.matches("^[a-zA-Z]*$"));
     }
 
     private static boolean isMiddleInitialCorrupt(String middleInitial){
-        return (middleInitial.matches("^[A-Z]") || middleInitial.length() != 1); //if not a letter or not 1 character, return false
+        return (middleInitial.matches("^[A-Z]") || middleInitial.length() != 1);
     }
 
     private static boolean isGenderCorrupt(String gender){
-        return gender.equalsIgnoreCase("F") || gender.equalsIgnoreCase("M"); //will be false if anything else
+        return gender.equalsIgnoreCase("F") || gender.equalsIgnoreCase("M");
     }
 
     private static boolean isEmailCorrupt(String email){
-        return email.matches("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$"); // looked up the regex for string, came up with that
+        return email.matches("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z]+$");
     }
 
     private static boolean isDateCorrupt(String dates) throws ParseException {
         SimpleDateFormat dateFormat = new SimpleDateFormat("M/d/yyyy");
         Date date = new Date();
-        if (dateFormat.parse(dates).after(date)) { // compares date to see if it's in the future
-            return false;
-        }
-        return true;
+        return !dateFormat.parse(dates).after(date);
     }
 
     private static boolean isSalaryCorrupt(String salary){
-        if (Integer.parseInt(salary) < 0) { //cant have salary under 0
-            return false;
-        }
-        return true;
+        return Integer.parseInt(salary) >= 0;
     }
 }
