@@ -15,7 +15,6 @@ public class EmployeeDTO {
     private LocalDate dateOfJoining;
     private String salary;
 
-
     public EmployeeDTO(String [] csvInput) {
         this.empID = csvInput[0];
         this.namePrefix = csvInput[1];
@@ -72,7 +71,7 @@ public class EmployeeDTO {
     @Override
     public String toString() {
         return "EmployeeID" + empID +
-                "namePrefix='" +  + '\'' +
+                "namePrefix='" + namePrefix + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", middleInitial='" + middleInitial + '\'' +
                 ", LastName='" + lastName + '\'' +
@@ -83,4 +82,3 @@ public class EmployeeDTO {
                 ", salary=" + salary + "\n";
     }
 }
-
