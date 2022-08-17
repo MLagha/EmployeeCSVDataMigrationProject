@@ -1,8 +1,14 @@
 package com.sparta.ml.dao;
+
+import com.sparta.ml.ConnectionManager;
+
 import com.sparta.ml.DataCorruptionChecker;
+import com.sparta.ml.SQLQueries;
 import com.sparta.ml.dto.EmployeeDTO;
 import java.io.*;
+import java.sql.*;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +51,14 @@ public class EmployeeDAO {
                                     employeesMap.put(record[0], employeeDTO);
                             writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
                             cleanCount++;
+
+/*
+                            Connection postgresConn = ConnectionManager.connectToDB();
+                            EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
+                            employeeDAO.createEmployee(Integer.parseInt(record[0]),  record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]);
+                            ConnectionManager.closeConnection();
+ */
+
                         } else {
                             logger.log(Level.FINE, "duplicate found, record is " + Arrays.toString(record));
                             writeToFile("src/main/resources/DuplicateEntries.csv", employeeDTO);
@@ -72,4 +86,74 @@ public class EmployeeDAO {
         bufferedWriter.write(employeeDTO.toString());
         bufferedWriter.close();
     }
+
+
+    //////////////////
+
+
+    private Connection postgresConn;        //final?
+
+    private Statement statement;
+    public EmployeeDAO(Connection postgresConn) {
+        this.postgresConn = postgresConn;
+        try {
+            statement = postgresConn.createStatement();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+
+    public void createEmployee(int empID, String namePrefix, String firstName, String middleInitial, String lastName, String gender, String email, String dateOfBirth, String dateOfJoining, String salary) {
+        try {
+
+
+            String sqlTable = null;
+
+            //Drop employee table if exists then create a new one
+            sqlTable = SQLQueries.DROP_TABLE;
+            statement.executeUpdate(sqlTable);
+            System.out.println("Employee table dropped");
+
+            sqlTable = SQLQueries.CREATE_TABLE + " ( "
+                    + "empID INT NOT NULL, "
+                    + "namePrefix VARCHAR(255),"
+                    + "firstName VARCHAR(255),"
+                    + "middleInitial VARCHAR(255),"
+                    + "lastName VARCHAR(255),"
+                    + "gender VARCHAR(255),"
+                    + "email VARCHAR(255),"
+                    + "dateOfBirth VARCHAR(255),"
+                    + "dateOfJoining VARCHAR(255),"
+                    + "salary VARCHAR(255))";
+            statement.executeUpdate(sqlTable);
+            System.out.println("Employee table created");
+
+
+            PreparedStatement preparedStatement = postgresConn.prepareStatement(SQLQueries.INSERT_INTO_DB);
+            preparedStatement.setInt(1, empID);
+            preparedStatement.setString(2, namePrefix);
+            preparedStatement.setString(3, firstName);
+            preparedStatement.setString(4, middleInitial);
+            preparedStatement.setString(5, lastName);
+            preparedStatement.setString(6, gender);
+            preparedStatement.setString(7, email);
+            preparedStatement.setString(8, dateOfBirth);
+            preparedStatement.setString(9, dateOfJoining);
+            preparedStatement.setString(10, salary);
+
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
+
 }
