@@ -63,9 +63,9 @@ public class EmployeeDAO implements Runnable{
                 }
             }
             logger.log(Level.INFO, "Reading csv while-loop ends");
-            logger.log(Level.INFO, dupeCount + " duplicates found");
-            logger.log(Level.INFO, corruptCount + " Corrupted found");
-            logger.log(Level.INFO, cleanCount + " clean left");
+            logger.log(Level.INFO, dupeCount + " Duplicate records found");
+            logger.log(Level.INFO, corruptCount + " Corrupted records found");
+            logger.log(Level.INFO, cleanCount + " Unique and clean records left");
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -78,7 +78,7 @@ public class EmployeeDAO implements Runnable{
     }
 
     private static Connection postgresConn;        //final?
-    private Statement statement;
+    private static Statement statement;
     public EmployeeDAO(Connection postgresConn) {
         this.postgresConn = postgresConn;
         try {
@@ -109,7 +109,6 @@ public class EmployeeDAO implements Runnable{
     }
 
     public void createEmployeeTable() throws SQLException {
-        //Drop employee table if exists then create a new one
         String sqlTable = SQLQueries.DROP_TABLE;
         statement.executeUpdate(sqlTable);
         System.out.println("Employee table dropped");
@@ -122,8 +121,8 @@ public class EmployeeDAO implements Runnable{
                 + "Last_Name VARCHAR(255),"
                 + "Gender VARCHAR(255),"
                 + "E_Mail VARCHAR(255),"
-                + "Date_of_Birth VARCHAR(255),"
-                + "Date_of_Joining VARCHAR(255),"
+                + "Date_of_Birth DATE,"
+                + "Date_of_Joining DATE,"
                 + "Salary VARCHAR(255))";
         statement.executeUpdate(sqlTable);
         System.out.println("Employee table created");
@@ -132,6 +131,29 @@ public class EmployeeDAO implements Runnable{
     public static void employeeMapToSQL() {
         for (Map.Entry<String, EmployeeDTO> set: employeesMap.entrySet()) {
             createEmployeeRecordDb(Integer.parseInt(set.getKey()),  set.getValue().getNamePrefix(), set.getValue().getFirstName(), set.getValue().getMiddleInitial(), set.getValue().getLastName(), set.getValue().getGender(), set.getValue().getEmail(), set.getValue().getDateOfBirth(), set.getValue().getDateOfJoining(), set.getValue().getSalary());
+        }
+    }
+
+    public static void retrieveRecordsFromSQL() {
+        try {
+            logger.log(Level.INFO, "Retrieving clean individual records from the database");
+            ResultSet resultSet = statement.executeQuery(SQLQueries.SELECT_ALL);
+            System.out.println("Emp ID, " + "Name Prefix, " + "First Name, " + "Middle Initial, " + "Last Name,  " + "Gender, " + "E Mail, " + "Date of Birth, " + "Date of Joining, " + "Salary");
+            while (resultSet.next()) {
+                System.out.println(resultSet.getInt(1)
+                        + " " + resultSet.getString(2)
+                        + " " + resultSet.getString(3)
+                        + " " + resultSet.getString(4)
+                        + " " + resultSet.getString(5)
+                        + " " + resultSet.getString(6)
+                        + " " + resultSet.getString(7)
+                        + " " + resultSet.getString(8)
+                        + " " + resultSet.getString(9)
+                        + " " + resultSet.getString(10));
+            }
+            logger.log(Level.INFO, "Finished retrieving clean individual records from the database");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
