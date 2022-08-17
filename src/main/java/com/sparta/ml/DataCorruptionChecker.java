@@ -3,9 +3,13 @@ package com.sparta.ml;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DataCorruptionChecker {
-
+    private static final Logger logger = Logger.getLogger("my logger");
+    private static ConsoleHandler consoleHandler = new ConsoleHandler();
     private static final int numberOfColumns = 10;
 
     public static boolean isRecordCorrupt(String[] employeeRecord) throws ParseException {
@@ -24,11 +28,14 @@ public class DataCorruptionChecker {
     }
 
     private static boolean isEmployeeIdCorrupt(String employeeId){
+        consoleHandler.setLevel(Level.INFO);
         try {
             Integer.parseInt(employeeId);
         } catch (NumberFormatException e) {
+            logger.log(Level.FINE, employeeId + " isEmployeeIdCorrupt is false");
             return false;
         }
+        logger.log(Level.FINE, employeeId + " isEmployeeIdCorrupt is true");
         return true;
     }
 

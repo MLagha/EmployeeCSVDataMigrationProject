@@ -1,10 +1,10 @@
 package com.sparta.ml.dao;
 
 import com.sparta.ml.ConnectionManager;
+
 import com.sparta.ml.DataCorruptionChecker;
 import com.sparta.ml.SQLQueries;
 import com.sparta.ml.dto.EmployeeDTO;
-
 import java.io.*;
 import java.sql.*;
 import java.text.ParseException;
@@ -30,20 +30,27 @@ public class EmployeeDAO {
 
     public static void populateHashMap(String filename) {
         consoleHandler.setLevel(Level.INFO);
+        logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
         try {
             var fileReader = new FileReader("src/main/resources/EmployeeRecords.csv");
             bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine();
             String line;
+            int dupeCount = 0;
+            int corruptCount = 0;
+            int cleanCount = 0;
             while ((line = bufferedReader.readLine()) != null) {
+                logger.log(Level.FINE, "In while loop to read csv line. line is: " + line);
                 String[] record = line.split(",");
                 EmployeeDTO employeeDTO = new EmployeeDTO(record);
-                //if no data corruption
                 if (DataCorruptionChecker.isRecordCorrupt(record)) {
+                    logger.log(Level.FINE, "In if statement to check if record is currupt, isRecordCorrupt is: " + DataCorruptionChecker.isRecordCorrupt(record));
                     try {
                         if (!employeesMap.containsKey(record[0])) {
-                            employeesMap.put(record[0], employeeDTO);
+                            logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap, containKey is: " + employeesMap.containsKey(record[0]));
+                                    employeesMap.put(record[0], employeeDTO);
                             writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
+                            cleanCount++;
 
 /*
                             Connection postgresConn = ConnectionManager.connectToDB();
@@ -53,20 +60,24 @@ public class EmployeeDAO {
  */
 
                         } else {
-                            logger.log(Level.FINE, "employeesMap.containsKey(record[0]) duplicate found, record is " + Arrays.toString(record));
+                            logger.log(Level.FINE, "duplicate found, record is " + Arrays.toString(record));
                             writeToFile("src/main/resources/DuplicateEntries.csv", employeeDTO);
+                            dupeCount++;
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 } else {
                     writeToFile("src/main/resources/CorruptEntries.csv", employeeDTO);
+                    corruptCount++;
                 }
             }
-        } catch (IOException e) {
+            logger.log(Level.INFO, "Reading csv while-loop ends");
+            logger.log(Level.INFO, dupeCount + " duplicates found");
+            logger.log(Level.INFO, corruptCount + " Corrupted found");
+            logger.log(Level.INFO, cleanCount + " clean left");
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
         }
     }
 
