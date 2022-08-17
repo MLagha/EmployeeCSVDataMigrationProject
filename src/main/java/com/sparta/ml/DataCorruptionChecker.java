@@ -60,7 +60,7 @@ public class DataCorruptionChecker {
     }
 
     private static boolean isEmailCorrupt(String email){
-        return email.matches("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z]+$");
+        return email.matches("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$");
     }
 
     private static boolean isDateCorrupt(String dates) throws ParseException {

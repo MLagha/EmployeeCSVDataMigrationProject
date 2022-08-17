@@ -1,7 +1,5 @@
 package com.sparta.ml.dao;
 
-import com.sparta.ml.ConnectionManager;
-
 import com.sparta.ml.DataCorruptionChecker;
 import com.sparta.ml.SQLQueries;
 import com.sparta.ml.dto.EmployeeDTO;
@@ -18,7 +16,7 @@ import java.util.logging.Logger;
 
 //Data Access Object
 //CRUD
-public class EmployeeDAO {
+public class EmployeeDAO implements Runnable{
     private static final Logger logger = Logger.getLogger("my logger");
     private static ConsoleHandler consoleHandler = new ConsoleHandler();
     private static Map<String, EmployeeDTO> employeesMap = new HashMap<>();
@@ -48,17 +46,9 @@ public class EmployeeDAO {
                     try {
                         if (!employeesMap.containsKey(record[0])) {
                             logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap, containKey is: " + employeesMap.containsKey(record[0]));
-                                    employeesMap.put(record[0], employeeDTO);
+                            employeesMap.put(record[0], employeeDTO);
                             writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
                             cleanCount++;
-
-/*
-                            Connection postgresConn = ConnectionManager.connectToDB();
-                            EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
-                            employeeDAO.createEmployee(Integer.parseInt(record[0]),  record[1], record[2], record[3], record[4], record[5], record[6], record[7], record[8], record[9]);
-                            ConnectionManager.closeConnection();
- */
-
                         } else {
                             logger.log(Level.FINE, "duplicate found, record is " + Arrays.toString(record));
                             writeToFile("src/main/resources/DuplicateEntries.csv", employeeDTO);
@@ -87,12 +77,7 @@ public class EmployeeDAO {
         bufferedWriter.close();
     }
 
-
-    //////////////////
-
-
-    private Connection postgresConn;        //final?
-
+    private static Connection postgresConn;        //final?
     private Statement statement;
     public EmployeeDAO(Connection postgresConn) {
         this.postgresConn = postgresConn;
@@ -101,48 +86,21 @@ public class EmployeeDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
-
-    public void createEmployee(int empID, String namePrefix, String firstName, String middleInitial, String lastName, String gender, String email, String dateOfBirth, String dateOfJoining, String salary) {
+    public static void createEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial, String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining, String Salary) {
         try {
-
-
-            String sqlTable = null;
-
-            //Drop employee table if exists then create a new one
-            sqlTable = SQLQueries.DROP_TABLE;
-            statement.executeUpdate(sqlTable);
-            System.out.println("Employee table dropped");
-
-            sqlTable = SQLQueries.CREATE_TABLE + " ( "
-                    + "empID INT NOT NULL, "
-                    + "namePrefix VARCHAR(255),"
-                    + "firstName VARCHAR(255),"
-                    + "middleInitial VARCHAR(255),"
-                    + "lastName VARCHAR(255),"
-                    + "gender VARCHAR(255),"
-                    + "email VARCHAR(255),"
-                    + "dateOfBirth VARCHAR(255),"
-                    + "dateOfJoining VARCHAR(255),"
-                    + "salary VARCHAR(255))";
-            statement.executeUpdate(sqlTable);
-            System.out.println("Employee table created");
-
-
             PreparedStatement preparedStatement = postgresConn.prepareStatement(SQLQueries.INSERT_INTO_DB);
-            preparedStatement.setInt(1, empID);
-            preparedStatement.setString(2, namePrefix);
-            preparedStatement.setString(3, firstName);
-            preparedStatement.setString(4, middleInitial);
-            preparedStatement.setString(5, lastName);
-            preparedStatement.setString(6, gender);
-            preparedStatement.setString(7, email);
-            preparedStatement.setString(8, dateOfBirth);
-            preparedStatement.setString(9, dateOfJoining);
-            preparedStatement.setString(10, salary);
+            preparedStatement.setInt(1, Emp_ID);
+            preparedStatement.setString(2, Name_Prefix);
+            preparedStatement.setString(3, First_Name);
+            preparedStatement.setString(4, Middle_Initial);
+            preparedStatement.setString(5, Last_Name);
+            preparedStatement.setString(6, Gender);
+            preparedStatement.setString(7, E_Mail);
+            preparedStatement.setDate(8, Date.valueOf(Date_of_Birth));
+            preparedStatement.setDate(9, Date.valueOf(Date_of_Joining));
+            preparedStatement.setString(10, Salary);
 
             preparedStatement.execute();
         } catch (SQLException e) {
@@ -150,10 +108,34 @@ public class EmployeeDAO {
         }
     }
 
+    public void createEmployeeTable() throws SQLException {
+        //Drop employee table if exists then create a new one
+        String sqlTable = SQLQueries.DROP_TABLE;
+        statement.executeUpdate(sqlTable);
+        System.out.println("Employee table dropped");
 
+        sqlTable = SQLQueries.CREATE_TABLE + " ( "
+                + "Emp_ID INT NOT NULL, "
+                + "Name_Prefix VARCHAR(255),"
+                + "First_Name VARCHAR(255),"
+                + "Middle_Initial VARCHAR(255),"
+                + "Last_Name VARCHAR(255),"
+                + "Gender VARCHAR(255),"
+                + "E_Mail VARCHAR(255),"
+                + "Date_of_Birth VARCHAR(255),"
+                + "Date_of_Joining VARCHAR(255),"
+                + "Salary VARCHAR(255))";
+        statement.executeUpdate(sqlTable);
+        System.out.println("Employee table created");
+    }
 
+    public static void employeeMapToSQL() {
+        for (Map.Entry<String, EmployeeDTO> set: employeesMap.entrySet()) {
+            createEmployeeRecordDb(Integer.parseInt(set.getKey()),  set.getValue().getNamePrefix(), set.getValue().getFirstName(), set.getValue().getMiddleInitial(), set.getValue().getLastName(), set.getValue().getGender(), set.getValue().getEmail(), set.getValue().getDateOfBirth(), set.getValue().getDateOfJoining(), set.getValue().getSalary());
+        }
+    }
 
-
-
-
+    @Override
+    public void run() {
+    }
 }
