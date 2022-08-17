@@ -72,7 +72,7 @@ public class EmployeeDTO {
     @Override
     public String toString() {
         return "EmployeeID" + empID +
-                "namePrefix='" +  + '\'' +
+                "namePrefix='" + namePrefix + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", middleInitial='" + middleInitial + '\'' +
                 ", LastName='" + lastName + '\'' +
