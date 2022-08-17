@@ -3,8 +3,6 @@ package com.sparta.ml.dto;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-// Emp ID, Name Prefix, First Name, Middle Initial, Last Name, Gender, E Mail, Date of Birth, Date of Joining, Salary
-//198429, Mrs.,
 public class EmployeeDTO {
     private final String empID;
     private String namePrefix;
@@ -17,7 +15,7 @@ public class EmployeeDTO {
     private LocalDate dateOfJoining;
     private String salary;
 
-    //09/07/2000
+
     public EmployeeDTO(String [] csvInput) {
         this.empID = csvInput[0];
         this.namePrefix = csvInput[1];
@@ -85,3 +83,4 @@ public class EmployeeDTO {
                 ", salary=" + salary + "\n";
     }
 }
+
