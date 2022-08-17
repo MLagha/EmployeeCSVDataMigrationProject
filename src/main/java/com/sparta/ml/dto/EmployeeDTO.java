@@ -5,15 +5,15 @@ import java.time.format.DateTimeFormatter;
 
 public class EmployeeDTO {
     private final String empID;
-    private String namePrefix;
-    private String firstName;
-    private String middleInitial;
-    private String lastName;
-    private String gender; //private char gender
-    private String email;
-    private LocalDate dateOfBirth;
-    private LocalDate dateOfJoining;
-    private String salary;
+    private final String namePrefix;
+    private final String firstName;
+    private final String middleInitial;
+    private final String lastName;
+    private final String gender;
+    private final String email;
+    private final LocalDate dateOfBirth;
+    private final LocalDate dateOfJoining;
+    private final String salary;
 
     public EmployeeDTO(String [] csvInput) {
         this.empID = csvInput[0];

@@ -3,7 +3,6 @@ package com.sparta.ml;
 import com.sparta.ml.dao.EmployeeDAO;
 import java.sql.*;
 
-//Iteration - Filtering
 public class App {
 
     public static void main( String[] args ) {

@@ -18,11 +18,10 @@ import java.util.logging.Logger;
 //CRUD
 public class EmployeeDAO {
     private static final Logger logger = Logger.getLogger("my logger");
-    private static ConsoleHandler consoleHandler = new ConsoleHandler();
-    private static BufferedReader bufferedReader;
-    private Map<String, EmployeeDTO> employeesMap = new HashMap<>();
+    private static final ConsoleHandler consoleHandler = new ConsoleHandler();
+    private final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
     private final Connection postgresConn;
-    private Statement statement;
+    private final Statement statement;
     public EmployeeDAO(Connection postgresConn) {
         this.postgresConn = postgresConn;
         try {
@@ -39,7 +38,7 @@ public class EmployeeDAO {
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
         try {
             var fileReader = new FileReader("src/main/resources/EmployeeRecords.csv");
-            bufferedReader = new BufferedReader(fileReader);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine();
             String line;
             int dupeCount = 0;
@@ -50,10 +49,12 @@ public class EmployeeDAO {
                 String[] record = line.split(",");
                 EmployeeDTO employeeDTO = new EmployeeDTO(record);
                 if (DataCorruptionChecker.isValid(record)) {
-                    logger.log(Level.FINE, "In if statement to check if record is currupt, isRecordCorrupt is: " + DataCorruptionChecker.isValid(record));
+                    logger.log(Level.FINE, "In if statement to check if record is currupt, isRecordCorrupt is: "
+                            + DataCorruptionChecker.isValid(record));
                     try {
                         if (!employeesMap.containsKey(record[0])) {
-                            logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap, containKey is: " + employeesMap.containsKey(record[0]));
+                            logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap" +
+                                    ", containKey is: " + employeesMap.containsKey(record[0]));
                             employeesMap.put(record[0], employeeDTO);
                             writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
                             cleanCount++;
