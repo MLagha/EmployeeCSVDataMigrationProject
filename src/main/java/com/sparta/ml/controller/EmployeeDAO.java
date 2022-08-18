@@ -89,7 +89,6 @@ public class EmployeeDAO {
         bufferedWriter.close();
     }
 
-
     public void insertEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial
             , String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining
             , String Salary) {
