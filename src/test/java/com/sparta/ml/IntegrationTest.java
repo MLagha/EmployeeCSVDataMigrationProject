@@ -1,6 +1,7 @@
 package com.sparta.ml;
 
-import com.sparta.ml.dao.EmployeeDAO;
+import com.sparta.ml.controller.ConnectionManager;
+import com.sparta.ml.controller.EmployeeDAO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
