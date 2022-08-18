@@ -12,7 +12,7 @@ public class DataCorruptionChecker {
     private static ConsoleHandler consoleHandler = new ConsoleHandler();
     private static final int numberOfColumns = 10;
 
-    public static boolean isRecordCorrupt(String[] employeeRecord) throws ParseException {
+    public static boolean isValid(String[] employeeRecord) throws ParseException {
 
         return (employeeRecord.length == numberOfColumns &&
                 isEmployeeIdCorrupt(employeeRecord[0]) &&
