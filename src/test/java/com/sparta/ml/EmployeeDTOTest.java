@@ -1,6 +1,6 @@
 package com.sparta.ml;
 
-import com.sparta.ml.dto.EmployeeDTO;
+import com.sparta.ml.model.EmployeeDTO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
