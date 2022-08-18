@@ -33,6 +33,19 @@ public class EmployeeDAO {
     public Map<String, EmployeeDTO> getEmployeesMap() {
         return employeesMap;
     }
+
+    private static Connection postgresConn;        //final?
+    private static Statement statement;
+    public EmployeeDAO(Connection postgresConn) {
+        this.postgresConn = postgresConn;
+        try {
+            statement = postgresConn.createStatement();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public void populateHashMap(String filename) {
         consoleHandler.setLevel(Level.INFO);
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
@@ -72,9 +85,9 @@ public class EmployeeDAO {
                 }
             }
             logger.log(Level.INFO, "Reading csv while-loop ends");
-            logger.log(Level.INFO, dupeCount + " duplicates found");
-            logger.log(Level.INFO, corruptCount + " Corrupted found");
-            logger.log(Level.INFO, cleanCount + " clean left");
+            logger.log(Level.INFO, dupeCount + " Duplicate records found");
+            logger.log(Level.INFO, corruptCount + " Corrupted records found");
+            logger.log(Level.INFO, cleanCount + " Unique and clean records left");
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
@@ -85,6 +98,7 @@ public class EmployeeDAO {
         bufferedWriter.write(employeeDTO.toString());
         bufferedWriter.close();
     }
+
 
     public void createEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial
             , String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining
@@ -110,10 +124,9 @@ public class EmployeeDAO {
     }
 
     public void createEmployeeTable() throws SQLException {
-        //Drop employee table if exists then create a new one
         String sqlTable = SQLQueries.DROP_TABLE;
         statement.executeUpdate(sqlTable);
-        System.out.println("Employee table dropped");
+        logger.log(Level.INFO, "Employee table dropped");
 
         sqlTable = SQLQueries.CREATE_TABLE + " ( "
                 + "Emp_ID INT NOT NULL, "
@@ -123,11 +136,11 @@ public class EmployeeDAO {
                 + "Last_Name VARCHAR(255),"
                 + "Gender VARCHAR(255),"
                 + "E_Mail VARCHAR(255),"
-                + "Date_of_Birth VARCHAR(255),"
-                + "Date_of_Joining VARCHAR(255),"
+                + "Date_of_Birth DATE,"
+                + "Date_of_Joining DATE,"
                 + "Salary VARCHAR(255))";
         statement.executeUpdate(sqlTable);
-        System.out.println("Employee table created");
+        logger.log(Level.INFO, "Employee table created");
     }
 
     public void employeeMapToSQL() {
@@ -145,4 +158,42 @@ public class EmployeeDAO {
                     , set.getValue().getSalary());
         }
     }
+
+    public static void retrieveRecordsFromSQL() {
+        logger.log(Level.INFO, "Retrieving clean individual records from the database");    //Prints table heading before logger!!!!
+        try {
+            ResultSet resultSet = statement.executeQuery(SQLQueries.SELECT_ALL);
+            System.out.println("Emp ID, " + "Name Prefix, " + "First Name, " + "Middle Initial, " + "Last Name,  " + "Gender, " + "E Mail, " + "Date of Birth, " + "Date of Joining, " + "Salary");
+            while (resultSet.next()) {
+                System.out.println(resultSet.getInt(1)
+                        + " " + resultSet.getString(2)
+                        + " " + resultSet.getString(3)
+                        + " " + resultSet.getString(4)
+                        + " " + resultSet.getString(5)
+                        + " " + resultSet.getString(6)
+                        + " " + resultSet.getString(7)
+                        + " " + resultSet.getString(8)
+                        + " " + resultSet.getString(9)
+                        + " " + resultSet.getString(10));
+            }
+            logger.log(Level.INFO, "Finished retrieving clean individual records from the database");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+        /*
+        for (int i = 0; i <= 5; i++)
+            System.out.println(Thread.currentThread().getName() + " " + i);
+
+
+        {
+            try {
+                Thread.sleep(500);          //wait for half a second
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+         */
+
 }
