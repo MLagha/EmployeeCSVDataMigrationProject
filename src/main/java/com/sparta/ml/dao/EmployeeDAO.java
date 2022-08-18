@@ -131,7 +131,7 @@ public class EmployeeDAO {
         logger.log(Level.INFO, "Employee table created");
     }
 
-    public void employeeMapToSQL(HashMap<String, EmployeeDTO> employees) {
+    public void employeeMapToSQL(Map<String, EmployeeDTO> employees) {
         for (Map.Entry<String, EmployeeDTO> set: employees.entrySet()) {
             createEmployeeRecordDb(Integer.parseInt(
                     set.getKey())
