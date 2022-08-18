@@ -34,18 +34,6 @@ public class EmployeeDAO {
         return employeesMap;
     }
 
-    private static Connection postgresConn;        //final?
-    private static Statement statement;
-    public EmployeeDAO(Connection postgresConn) {
-        this.postgresConn = postgresConn;
-        try {
-            statement = postgresConn.createStatement();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
     public void populateHashMap(String filename) {
         consoleHandler.setLevel(Level.INFO);
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
@@ -159,7 +147,7 @@ public class EmployeeDAO {
         }
     }
 
-    public static void retrieveRecordsFromSQL() {
+    public void retrieveRecordsFromSQL() {
         logger.log(Level.INFO, "Retrieving clean individual records from the database");    //Prints table heading before logger!!!!
         try {
             ResultSet resultSet = statement.executeQuery(SQLQueries.SELECT_ALL);
@@ -181,19 +169,4 @@ public class EmployeeDAO {
             e.printStackTrace();
         }
     }
-    
-        /*
-        for (int i = 0; i <= 5; i++)
-            System.out.println(Thread.currentThread().getName() + " " + i);
-
-
-        {
-            try {
-                Thread.sleep(500);          //wait for half a second
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-         */
-
 }
