@@ -1,6 +1,6 @@
-package com.sparta.ml;
+package com.sparta.ml.controller;
 
-import com.sparta.ml.util.PropertiesLoader;
+import com.sparta.ml.controller.util.PropertiesLoader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

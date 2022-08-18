@@ -1,8 +1,9 @@
-package com.sparta.ml.dao;
+package com.sparta.ml.controller;
 
-import com.sparta.ml.DataCorruptionChecker;
-import com.sparta.ml.SQLQueries;
-import com.sparta.ml.dto.EmployeeDTO;
+import com.sparta.ml.model.DataCorruptionChecker;
+import com.sparta.ml.model.EmployeeDTO;
+import com.sparta.ml.controller.util.SQLQueries;
+
 import java.io.*;
 import java.sql.*;
 import java.text.ParseException;
@@ -14,8 +15,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//Data Access Object
-//CRUD
 public class EmployeeDAO {
     private static final Logger logger = Logger.getLogger("my logger");
     private static final ConsoleHandler consoleHandler = new ConsoleHandler();
@@ -36,21 +35,24 @@ public class EmployeeDAO {
 
     public void populateHashMap(String filename) {
         consoleHandler.setLevel(Level.INFO);
+        logger.setUseParentHandlers(true);
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
         try {
-            var fileReader = new FileReader("src/main/resources/EmployeeRecords.csv");
+            var fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine();
+
             String line;
             int dupeCount = 0;
             int corruptCount = 0;
             int cleanCount = 0;
+
             while ((line = bufferedReader.readLine()) != null) {
                 logger.log(Level.FINE, "In while loop to read csv line. line is: " + line);
                 String[] record = line.split(",");
                 EmployeeDTO employeeDTO = new EmployeeDTO(record);
                 if (DataCorruptionChecker.isValid(record)) {
-                    logger.log(Level.FINE, "In if statement to check if record is currupt, isRecordCorrupt is: "
+                    logger.log(Level.FINE, "In if statement to check if record is corrupt, isRecordCorrupt is: "
                             + DataCorruptionChecker.isValid(record));
                     try {
                         if (!employeesMap.containsKey(record[0])) {
@@ -87,8 +89,7 @@ public class EmployeeDAO {
         bufferedWriter.close();
     }
 
-
-    public void createEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial
+    public void insertEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial
             , String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining
             , String Salary) {
 
@@ -131,9 +132,9 @@ public class EmployeeDAO {
         logger.log(Level.INFO, "Employee table created");
     }
 
-    public void employeeMapToSQL() {
-        for (Map.Entry<String, EmployeeDTO> set: employeesMap.entrySet()) {
-            createEmployeeRecordDb(Integer.parseInt(
+    public void convertMapToSQL(Map<String, EmployeeDTO> employees) {
+        for (Map.Entry<String, EmployeeDTO> set: employees.entrySet()) {
+            insertEmployeeRecordDb(Integer.parseInt(
                     set.getKey())
                     , set.getValue().getNamePrefix()
                     , set.getValue().getFirstName()

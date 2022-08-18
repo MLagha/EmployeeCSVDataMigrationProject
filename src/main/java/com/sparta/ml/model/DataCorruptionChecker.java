@@ -1,4 +1,4 @@
-package com.sparta.ml;
+package com.sparta.ml.model;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

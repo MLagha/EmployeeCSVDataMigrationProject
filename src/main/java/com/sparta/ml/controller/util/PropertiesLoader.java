@@ -1,4 +1,4 @@
-package com.sparta.ml.util;
+package com.sparta.ml.controller.util;
 
 import java.io.FileReader;
 import java.io.IOException;

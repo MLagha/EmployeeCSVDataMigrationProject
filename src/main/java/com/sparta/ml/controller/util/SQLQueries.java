@@ -1,4 +1,4 @@
-package com.sparta.ml;
+package com.sparta.ml.controller.util;
 public interface SQLQueries {
 
     String SELECT_ALL = "SELECT * from public.employee_db";

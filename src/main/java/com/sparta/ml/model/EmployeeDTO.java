@@ -1,4 +1,4 @@
-package com.sparta.ml.dto;
+package com.sparta.ml.model;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
