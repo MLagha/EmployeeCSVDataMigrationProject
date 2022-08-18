@@ -20,7 +20,7 @@ public class App {
         double end = System.nanoTime();
         System.out.println("\nTime taken to persist to SQL table before implementing multiple threads: " + (end - start)/1_000_000_000 + " seconds");
 
-        //EmployeeDAO.retrieveRecordsFromSQL();
+        //employeeDAO.retrieveRecordsFromSQL();
 
         ConnectionManager.closeConnection();
     }
