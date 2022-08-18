@@ -38,7 +38,7 @@ public class EmployeeDAO {
         logger.setUseParentHandlers(true);
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
         try {
-            var fileReader = new FileReader("src/main/resources/EmployeeRecordsLarge.csv");
+            var fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine();
 

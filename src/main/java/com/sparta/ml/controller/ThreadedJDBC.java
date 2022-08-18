@@ -48,14 +48,14 @@ public class ThreadedJDBC implements Runnable {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        employeeDAO.populateHashMap("src/main/resources/EmployeeRecordsLarge.csv");
+        employeeDAO.populateHashMap("src/main/resources/EmployeeRecords.csv");
         splitHashMap();
         System.out.println(halfHMap1.size());
         Thread thread = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap1));
         Thread thread2 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap2));
         thread.start();
         thread2.start();
-            double end = System.nanoTime();
+        float end = System.nanoTime();
         System.out.println("\nTime taken to persist to SQL table before implementing multiple threads: " + (end - start)/1_000_000_000 + " seconds");
     }
 
