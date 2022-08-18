@@ -18,7 +18,10 @@ import java.util.logging.Logger;
 public class EmployeeDAO {
     private static final Logger logger = Logger.getLogger("my logger");
     private static final ConsoleHandler consoleHandler = new ConsoleHandler();
-    private final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
+    public  final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
+    public  final Map<String, EmployeeDTO> dupeEmployeesMap = new HashMap<>();
+    public  final Map<String, EmployeeDTO> corruptEmployeesMap = new HashMap<>();
+
     private final Connection postgresConn;
     private final Statement statement;
     public EmployeeDAO(Connection postgresConn) {
@@ -41,12 +44,7 @@ public class EmployeeDAO {
             var fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine();
-
             String line;
-            int dupeCount = 0;
-            int corruptCount = 0;
-            int cleanCount = 0;
-
             while ((line = bufferedReader.readLine()) != null) {
                 logger.log(Level.FINE, "In while loop to read csv line. line is: " + line);
                 String[] record = line.split(",");
@@ -54,38 +52,50 @@ public class EmployeeDAO {
                 if (DataCorruptionChecker.isValid(record)) {
                     logger.log(Level.FINE, "In if statement to check if record is corrupt, isRecordCorrupt is: "
                             + DataCorruptionChecker.isValid(record));
-                    try {
-                        if (!employeesMap.containsKey(record[0])) {
-                            logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap" +
-                                    ", containKey is: " + employeesMap.containsKey(record[0]));
-                            employeesMap.put(record[0], employeeDTO);
-                            writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
-                            cleanCount++;
-                        } else {
-                            logger.log(Level.FINE, "duplicate found, record is " + Arrays.toString(record));
-                            writeToFile("src/main/resources/DuplicateEntries.csv", employeeDTO);
-                            dupeCount++;
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    if (!employeesMap.containsKey(record[0])) {
+                        logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap" +
+                                ", containKey is: " + employeesMap.containsKey(record[0]));
+                        employeesMap.put(record[0], employeeDTO);
+//                            writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
+                    } else {
+                        logger.log(Level.FINE, "duplicate found, record is " + Arrays.toString(record));
+                        dupeEmployeesMap.put(record[0], employeeDTO);
+//                            writeToFile("src/main/resources/DuplicateEntries.csv", employeeDTO);
                     }
                 } else {
-                    writeToFile("src/main/resources/CorruptEntries.csv", employeeDTO);
-                    corruptCount++;
+                    corruptEmployeesMap.put(record[0], employeeDTO);
+//                    writeToFile("src/main/resources/CorruptEntries.csv", employeeDTO);
                 }
             }
             logger.log(Level.INFO, "Reading csv while-loop ends");
-            logger.log(Level.INFO, dupeCount + " Duplicate records found");
-            logger.log(Level.INFO, corruptCount + " Corrupted records found");
-            logger.log(Level.INFO, cleanCount + " Unique and clean records left");
+            logger.log(Level.INFO, dupeEmployeesMap.size() + " Duplicate records found");
+            logger.log(Level.INFO, corruptEmployeesMap.size() + " Corrupted records found");
+            logger.log(Level.INFO, employeesMap.size() + " Unique and clean records left");
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
     }
 
-    private void writeToFile(String fileName, EmployeeDTO employeeDTO) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
-        bufferedWriter.write(employeeDTO.toString());
+    public void writeToFile() throws IOException {
+        FileWriter fileWriter = new FileWriter("src/main/resources/DuplicateEntries.csv", true);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        for (Map.Entry<String, EmployeeDTO> set: dupeEmployeesMap.entrySet()) {
+            bufferedWriter.write(set.toString());
+        }
+        bufferedWriter.close();
+
+        fileWriter = new FileWriter("src/main/resources/CorruptEntries.csv", true);
+        bufferedWriter = new BufferedWriter(fileWriter);
+        for (Map.Entry<String, EmployeeDTO> set: corruptEmployeesMap.entrySet()) {
+            bufferedWriter.write(set.toString());
+        }
+        bufferedWriter.close();
+
+        fileWriter = new FileWriter("src/main/resources/CleanEntries.csv",true);
+        bufferedWriter = new BufferedWriter(fileWriter);
+        for (Map.Entry<String, EmployeeDTO> set: employeesMap.entrySet()) {
+            bufferedWriter.write(set.toString());
+        }
         bufferedWriter.close();
     }
 
@@ -170,4 +180,13 @@ public class EmployeeDAO {
             e.printStackTrace();
         }
     }
+
+    public Map<String, EmployeeDTO> getDupeEmployeesMap() {
+        return dupeEmployeesMap;
+    }
+
+    public Map<String, EmployeeDTO> getCorruptEmployeesMap() {
+        return corruptEmployeesMap;
+    }
+
 }
