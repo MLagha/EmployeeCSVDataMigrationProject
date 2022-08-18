@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 //Data Access Object
 //CRUD
-public class EmployeeDAO implements Runnable{
+public class EmployeeDAO {
     private static final Logger logger = Logger.getLogger("my logger");
     private static ConsoleHandler consoleHandler = new ConsoleHandler();
     private static Map<String, EmployeeDTO> employeesMap = new HashMap<>();
@@ -26,11 +26,22 @@ public class EmployeeDAO implements Runnable{
         return employeesMap;
     }
 
+    private static Connection postgresConn;        //final?
+    private static Statement statement;
+    public EmployeeDAO(Connection postgresConn) {
+        this.postgresConn = postgresConn;
+        try {
+            statement = postgresConn.createStatement();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void populateHashMap(String filename) {
         consoleHandler.setLevel(Level.INFO);
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
         try {
-            var fileReader = new FileReader("src/main/resources/EmployeeRecords.csv");
+            var fileReader = new FileReader("src/main/resources/EmployeeRecordsLarge.csv");
             bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine();
             String line;
@@ -77,17 +88,6 @@ public class EmployeeDAO implements Runnable{
         bufferedWriter.close();
     }
 
-    private static Connection postgresConn;        //final?
-    private static Statement statement;
-    public EmployeeDAO(Connection postgresConn) {
-        this.postgresConn = postgresConn;
-        try {
-            statement = postgresConn.createStatement();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static void createEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial, String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining, String Salary) {
         try {
             PreparedStatement preparedStatement = postgresConn.prepareStatement(SQLQueries.INSERT_INTO_DB);
@@ -111,7 +111,7 @@ public class EmployeeDAO implements Runnable{
     public void createEmployeeTable() throws SQLException {
         String sqlTable = SQLQueries.DROP_TABLE;
         statement.executeUpdate(sqlTable);
-        System.out.println("Employee table dropped");
+        logger.log(Level.INFO, "Employee table dropped");
 
         sqlTable = SQLQueries.CREATE_TABLE + " ( "
                 + "Emp_ID INT NOT NULL, "
@@ -125,7 +125,7 @@ public class EmployeeDAO implements Runnable{
                 + "Date_of_Joining DATE,"
                 + "Salary VARCHAR(255))";
         statement.executeUpdate(sqlTable);
-        System.out.println("Employee table created");
+        logger.log(Level.INFO, "Employee table created");
     }
 
     public static void employeeMapToSQL() {
@@ -135,8 +135,8 @@ public class EmployeeDAO implements Runnable{
     }
 
     public static void retrieveRecordsFromSQL() {
+        logger.log(Level.INFO, "Retrieving clean individual records from the database");    //Prints table heading before logger!!!!
         try {
-            logger.log(Level.INFO, "Retrieving clean individual records from the database");
             ResultSet resultSet = statement.executeQuery(SQLQueries.SELECT_ALL);
             System.out.println("Emp ID, " + "Name Prefix, " + "First Name, " + "Middle Initial, " + "Last Name,  " + "Gender, " + "E Mail, " + "Date of Birth, " + "Date of Joining, " + "Salary");
             while (resultSet.next()) {
@@ -156,8 +156,19 @@ public class EmployeeDAO implements Runnable{
             e.printStackTrace();
         }
     }
+    
+        /*
+        for (int i = 0; i <= 5; i++)
+            System.out.println(Thread.currentThread().getName() + " " + i);
 
-    @Override
-    public void run() {
-    }
+
+        {
+            try {
+                Thread.sleep(500);          //wait for half a second
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+         */
+
 }
