@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.sql.Connection;
 
 //setup //test //teardown
 public class IntegrationTest {
@@ -16,7 +17,9 @@ public class IntegrationTest {
 
 
     private void test(){
-        EmployeeDAO.populateHashMap("src/main/resources/EmployeeRecords.csv");
+        Connection postgresConn = ConnectionManager.connectToDB();
+        EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
+        employeeDAO.populateHashMap("src/main/resources/EmployeeRecords.csv");
         FileReader fileClean = null;
         FileReader fileDup = null;
         FileReader fileCorr = null;

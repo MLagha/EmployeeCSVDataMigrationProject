@@ -16,22 +16,29 @@ import java.util.logging.Logger;
 
 //Data Access Object
 //CRUD
-public class EmployeeDAO implements Runnable{
+public class EmployeeDAO {
     private static final Logger logger = Logger.getLogger("my logger");
-    private static ConsoleHandler consoleHandler = new ConsoleHandler();
-    private static Map<String, EmployeeDTO> employeesMap = new HashMap<>();
-    private static BufferedReader bufferedReader;
-
-    public static Map<String, EmployeeDTO> getEmployeesMap() {
+    private static final ConsoleHandler consoleHandler = new ConsoleHandler();
+    private final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
+    private final Connection postgresConn;
+    private final Statement statement;
+    public EmployeeDAO(Connection postgresConn) {
+        this.postgresConn = postgresConn;
+        try {
+            statement = postgresConn.createStatement();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public Map<String, EmployeeDTO> getEmployeesMap() {
         return employeesMap;
     }
-
-    public static void populateHashMap(String filename) {
+    public void populateHashMap(String filename) {
         consoleHandler.setLevel(Level.INFO);
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
         try {
             var fileReader = new FileReader("src/main/resources/EmployeeRecords.csv");
-            bufferedReader = new BufferedReader(fileReader);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
             bufferedReader.readLine();
             String line;
             int dupeCount = 0;
@@ -41,11 +48,13 @@ public class EmployeeDAO implements Runnable{
                 logger.log(Level.FINE, "In while loop to read csv line. line is: " + line);
                 String[] record = line.split(",");
                 EmployeeDTO employeeDTO = new EmployeeDTO(record);
-                if (DataCorruptionChecker.isRecordCorrupt(record)) {
-                    logger.log(Level.FINE, "In if statement to check if record is currupt, isRecordCorrupt is: " + DataCorruptionChecker.isRecordCorrupt(record));
+                if (DataCorruptionChecker.isValid(record)) {
+                    logger.log(Level.FINE, "In if statement to check if record is currupt, isRecordCorrupt is: "
+                            + DataCorruptionChecker.isValid(record));
                     try {
                         if (!employeesMap.containsKey(record[0])) {
-                            logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap, containKey is: " + employeesMap.containsKey(record[0]));
+                            logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap" +
+                                    ", containKey is: " + employeesMap.containsKey(record[0]));
                             employeesMap.put(record[0], employeeDTO);
                             writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
                             cleanCount++;
@@ -71,24 +80,16 @@ public class EmployeeDAO implements Runnable{
         }
     }
 
-    private static void writeToFile(String fileName, EmployeeDTO employeeDTO) throws IOException {
+    private void writeToFile(String fileName, EmployeeDTO employeeDTO) throws IOException {
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
         bufferedWriter.write(employeeDTO.toString());
         bufferedWriter.close();
     }
 
-    private static Connection postgresConn;        //final?
-    private Statement statement;
-    public EmployeeDAO(Connection postgresConn) {
-        this.postgresConn = postgresConn;
-        try {
-            statement = postgresConn.createStatement();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public void createEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial
+            , String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining
+            , String Salary) {
 
-    public static void createEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial, String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining, String Salary) {
         try {
             PreparedStatement preparedStatement = postgresConn.prepareStatement(SQLQueries.INSERT_INTO_DB);
             preparedStatement.setInt(1, Emp_ID);
@@ -129,13 +130,19 @@ public class EmployeeDAO implements Runnable{
         System.out.println("Employee table created");
     }
 
-    public static void employeeMapToSQL() {
+    public void employeeMapToSQL() {
         for (Map.Entry<String, EmployeeDTO> set: employeesMap.entrySet()) {
-            createEmployeeRecordDb(Integer.parseInt(set.getKey()),  set.getValue().getNamePrefix(), set.getValue().getFirstName(), set.getValue().getMiddleInitial(), set.getValue().getLastName(), set.getValue().getGender(), set.getValue().getEmail(), set.getValue().getDateOfBirth(), set.getValue().getDateOfJoining(), set.getValue().getSalary());
+            createEmployeeRecordDb(Integer.parseInt(
+                    set.getKey())
+                    , set.getValue().getNamePrefix()
+                    , set.getValue().getFirstName()
+                    , set.getValue().getMiddleInitial()
+                    , set.getValue().getLastName()
+                    , set.getValue().getGender()
+                    , set.getValue().getEmail()
+                    , set.getValue().getDateOfBirth()
+                    , set.getValue().getDateOfJoining()
+                    , set.getValue().getSalary());
         }
-    }
-
-    @Override
-    public void run() {
     }
 }
