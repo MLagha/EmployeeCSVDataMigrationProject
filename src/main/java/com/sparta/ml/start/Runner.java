@@ -14,7 +14,6 @@ public class Runner {
     public static void start() {
 
         try{
-
             start = System.nanoTime();
             Connection postgresConn = ConnectionManager.connectToDB();
             EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
@@ -24,17 +23,11 @@ public class Runner {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-
-
             employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
             end = System.nanoTime();
-
-            employeeDAO.retrieveRecordsFromSQL(3640);
-
+//            employeeDAO.retrieveRecordsFromSQL(3640);
             Display.enterSQLRecords();
             ConnectionManager.closeConnection();
-
-
         } catch (DatabaseMissingException e) {
             throw new RuntimeException(e);
         }

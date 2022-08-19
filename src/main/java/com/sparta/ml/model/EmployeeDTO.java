@@ -15,7 +15,7 @@ public class EmployeeDTO {
     private final LocalDate dateOfJoining;
     private final String salary;
 
-    public EmployeeDTO(String [] csvInput) {
+    public EmployeeDTO(String[] csvInput) {
         this.empID = csvInput[0];
         this.namePrefix = csvInput[1];
         this.firstName = csvInput[2];

@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class EmployeeDAO {
     private static final Logger logger = Logger.getLogger("my logger");
     private static final ConsoleHandler consoleHandler = new ConsoleHandler();
-    public final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
+    public final Map<int, EmployeeDTO> employeesMap = new HashMap<>();
     public final Map<String, EmployeeDTO> dupeEmployeesMap = new HashMap<>();
     public final Map<String, EmployeeDTO> corruptEmployeesMap = new HashMap<>();
     private final Connection postgresConn;
@@ -52,10 +52,10 @@ public class EmployeeDAO {
                 if (DataCorruptionChecker.isValid(record)) {
                     logger.log(Level.FINE, "In if statement to check if record is corrupt, isRecordCorrupt is: "
                             + DataCorruptionChecker.isValid(record));
-                    if (!employeesMap.containsKey(record[0])) {
+                    if (!employeesMap.containsKey(Integer.parseInt(record[0])) {
                         logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap" +
                                 ", containKey is: " + employeesMap.containsKey(record[0]));
-                        employeesMap.put(record[0], employeeDTO);
+                        employeesMap.put(Integer.parseInt(record[0]), employeeDTO);
                     } else {
                         logger.log(Level.FINE, "duplicate found, record is " + Arrays.toString(record));
                         dupeEmployeesMap.put(record[0], employeeDTO);
@@ -71,6 +71,10 @@ public class EmployeeDAO {
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
+    }
+
+    public void clearHashMap() {
+        employeesMap.clear();
     }
 
     public void writeToFile() throws IOException {
@@ -97,7 +101,7 @@ public class EmployeeDAO {
     }
 
 
-    public void printLargeFileToDB(String filename) {
+    public void csvToHashMap(String filename) {
         try {
             var fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -118,7 +122,6 @@ public class EmployeeDAO {
     public void insertEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial
             , String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining
             , String Salary) {
-
         try {
             PreparedStatement preparedStatement = postgresConn.prepareStatement(SQLQueries.INSERT_INTO_DB);
             preparedStatement.setInt(1, Emp_ID);
@@ -131,7 +134,6 @@ public class EmployeeDAO {
             preparedStatement.setDate(8, Date.valueOf(Date_of_Birth));
             preparedStatement.setDate(9, Date.valueOf(Date_of_Joining));
             preparedStatement.setString(10, Salary);
-
             preparedStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -141,8 +143,7 @@ public class EmployeeDAO {
     public void createEmployeeTable() throws SQLException {
         String sqlTable = SQLQueries.DROP_TABLE;
         statement.executeUpdate(sqlTable);
-        //logger.log(Level.INFO, "Employee table dropped");
-
+        logger.log(Level.INFO, "Employee table dropped");
         sqlTable = SQLQueries.CREATE_TABLE + " ( "
                 + "Emp_ID INT NOT NULL, "
                 + "Name_Prefix VARCHAR(255),"
@@ -155,7 +156,7 @@ public class EmployeeDAO {
                 + "Date_of_Joining DATE,"
                 + "Salary VARCHAR(255))";
         statement.executeUpdate(sqlTable);
-        //logger.log(Level.INFO, "Employee table created");
+        logger.log(Level.INFO, "Employee table created");
     }
 
     public void convertMapToSQL(Map<String, EmployeeDTO> employees) {
@@ -174,7 +175,7 @@ public class EmployeeDAO {
         }
     }
 
-    public void retrieveRecordsFromSQL(int emp_ID) {
+    public EmployeeDTO retrieveRecordsFromSQL(int emp_ID) {
             logger.log(Level.INFO, "Retrieving clean individual records from the database");
             PreparedStatement preparedStatement;
             ResultSet resultSet;
@@ -182,25 +183,23 @@ public class EmployeeDAO {
                 preparedStatement = postgresConn.prepareStatement(SQLQueries.SELECT);
                 preparedStatement.setInt(1, emp_ID);
                 resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
-                    System.out.println(resultSet.getString(1)
-                            + " " + resultSet.getString(2)
-                            + " " + resultSet.getString(3)
-                            + " " + resultSet.getString(4)
-                            + " " + resultSet.getString(5)
-                            + " " + resultSet.getString(6)
-                            + " " + resultSet.getString(7)
-                            + " " + resultSet.getString(8)
-                            + " " + resultSet.getString(9)
-                            + " " + resultSet.getString(10));
-                }
+                String[] record = {resultSet.getString(1)
+                        , resultSet.getString(2)
+                        , resultSet.getString(3)
+                        , resultSet.getString(4)
+                        , resultSet.getString(5)
+                        , resultSet.getString(6)
+                        , resultSet.getString(7)
+                        , resultSet.getString(8)
+                        , resultSet.getString(9)
+                        , resultSet.getString(10)};
+                EmployeeDTO employeeDTO = new EmployeeDTO(record);
                 resultSet.close();
                 preparedStatement.close();
+                return employeeDTO;
             } catch (SQLException e) {
                 e.printStackTrace();
-
             }
-
+            return null;
         }
-
 }

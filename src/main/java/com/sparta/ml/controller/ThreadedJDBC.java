@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ThreadedJDBC implements Runnable {
+public class ThreadedJDBC {
     public static float start;
     public static float end;
     private final HashMap<String, EmployeeDTO> employees;
@@ -16,12 +16,6 @@ public class ThreadedJDBC implements Runnable {
     public ThreadedJDBC(HashMap<String, EmployeeDTO> employees) {
         this.employees = employees;
         this.connection = ConnectionManager.connectToDB();
-    }
-
-    @Override
-    public void run() {
-
-
     }
 
     static Connection postgresConn = ConnectionManager.connectToDB();
@@ -68,7 +62,7 @@ public class ThreadedJDBC implements Runnable {
             throw new RuntimeException(e);
         }
         //employeeDAO.populateHashMap("src/main/resources/EmployeeRecordsLarge.csv");     //For corrupted files
-        employeeDAO.printLargeFileToDB("src/main/resources/EmployeeRecordsLarge.csv");        //For clean files
+        employeeDAO.csvToHashMap("src/main/resources/EmployeeRecordsLarge.csv");        //For clean files
         splitHashMap();
 
 
@@ -96,7 +90,7 @@ public class ThreadedJDBC implements Runnable {
         end = System.nanoTime();
         Display.enterSQLRecords();
 
-        //System.out.println("\nTime taken to persist to SQL table AFTER implementing multiple threads: " + (end - start)/1_000_000_000 + " seconds");
+        System.out.println("\nTime taken to persist to SQL table AFTER implementing multiple threads: " + (end - start)/1_000_000_000 + " seconds");
     }
 
 }
