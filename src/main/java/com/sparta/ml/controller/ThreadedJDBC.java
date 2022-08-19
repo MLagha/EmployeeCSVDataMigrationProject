@@ -3,6 +3,7 @@ package com.sparta.ml.controller;//package com.sparta.ml;
 import com.sparta.ml.controller.ConnectionManager;
 import com.sparta.ml.controller.EmployeeDAO;
 import com.sparta.ml.display.Display;
+
 import com.sparta.ml.model.EmployeeDTO;
 
 import java.sql.Connection;
@@ -44,8 +45,6 @@ public class ThreadedJDBC implements Runnable {
             (count < (hMap.size() / 2) ? halfHMap1 : halfHMap2 ).put(entry.getKey(), entry.getValue());
             count++;
         }
-
-        //hMap = halfHMap1;
         count = 0;
         for (Map.Entry<String, EmployeeDTO> entry : halfHMap1.entrySet()) {
             (count < (halfHMap1.size() / 2) ? halfHMap3 : halfHMap4).put(entry.getKey(), entry.getValue());
@@ -56,6 +55,7 @@ public class ThreadedJDBC implements Runnable {
             (count < (halfHMap2.size() / 2) ? halfHMap5 : halfHMap6).put(entry.getKey(), entry.getValue());
             count++;
         }
+
     }
 
     public static void runThreads() {
@@ -73,16 +73,16 @@ public class ThreadedJDBC implements Runnable {
         System.out.println(halfHMap5.size());
         System.out.println(halfHMap6.size());
 
-        Thread thread3 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap3));
-        Thread thread4 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap4));
-        Thread thread5 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap5));
-        Thread thread6 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap6));
-
+        Thread thread1 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap3));
+        Thread thread2 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap4));
+        Thread thread3 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap5));
+        Thread thread4 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap6));
+        thread1.start();
+        thread2.start();
         thread3.start();
         thread4.start();
-        thread5.start();
-        thread6.start();
+
         end = System.nanoTime();
-        System.out.println("\nTime taken to persist to SQL table after implementing multiple threads: " + (end - start)/1_000_000_000 + " seconds");
+        System.out.println("\nTime taken to persist to SQL table AFTER implementing multiple threads: " + (end - start)/1_000_000_000 + " seconds");
     }
 }

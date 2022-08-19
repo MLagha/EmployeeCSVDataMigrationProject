@@ -26,13 +26,15 @@ public class Runner {
             }
             employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
             end = System.nanoTime();
-            employeeDAO.retrieveRecordsFromSQL();
-            ConnectionManager.closeConnection();
+            
 
+            employeeDAO.retrieveRecordsFromSQL(3640);
+            ConnectionManager.closeConnection();
 
             ThreadedJDBC.runThreads();
 
             Display.enterSQLRecords();
+
         } catch (DatabaseMissingException e) {
             throw new RuntimeException(e);
         }
