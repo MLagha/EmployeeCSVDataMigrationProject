@@ -21,6 +21,7 @@ public class EmployeeDAO {
     private final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
     private final Connection postgresConn;
     private final Statement statement;
+
     public EmployeeDAO(Connection postgresConn) {
         this.postgresConn = postgresConn;
         try {
@@ -133,7 +134,7 @@ public class EmployeeDAO {
     public void createEmployeeTable() throws SQLException {
         String sqlTable = SQLQueries.DROP_TABLE;
         statement.executeUpdate(sqlTable);
-        logger.log(Level.INFO, "Employee table dropped");
+        //logger.log(Level.INFO, "Employee table dropped");
 
         sqlTable = SQLQueries.CREATE_TABLE + " ( "
                 + "Emp_ID INT NOT NULL, "
@@ -147,7 +148,7 @@ public class EmployeeDAO {
                 + "Date_of_Joining DATE,"
                 + "Salary VARCHAR(255))";
         statement.executeUpdate(sqlTable);
-        logger.log(Level.INFO, "Employee table created");
+        //logger.log(Level.INFO, "Employee table created");
     }
 
     public void convertMapToSQL(Map<String, EmployeeDTO> employees) {
@@ -166,10 +167,13 @@ public class EmployeeDAO {
         }
     }
 
-    public void retrieveRecordsFromSQL() {
+
+    public void retrieveRecordsFromSQL(int Emp_ID) {
         logger.log(Level.INFO, "Retrieving clean individual records from the database");    //Prints table heading before logger!!!!
+
+
         try {
-            ResultSet resultSet = statement.executeQuery(SQLQueries.SELECT_ALL);
+            ResultSet resultSet = statement.executeQuery(SQLQueries.SELECT);
             System.out.println("Emp ID, " + "Name Prefix, " + "First Name, " + "Middle Initial, " + "Last Name,  " + "Gender, " + "E Mail, " + "Date of Birth, " + "Date of Joining, " + "Salary");
             while (resultSet.next()) {
                 System.out.println(resultSet.getInt(1)
@@ -188,4 +192,6 @@ public class EmployeeDAO {
             e.printStackTrace();
         }
     }
+
+
 }
