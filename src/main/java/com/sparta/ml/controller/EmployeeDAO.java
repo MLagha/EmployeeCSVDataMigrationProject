@@ -85,7 +85,7 @@ public class EmployeeDAO {
         }
     }
 
-    public void printLargeFileToDB(String filename) {
+    public void csvToHashMap(String filename) {
         try {
             var fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
