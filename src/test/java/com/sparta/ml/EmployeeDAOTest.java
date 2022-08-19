@@ -32,10 +32,12 @@ public class EmployeeDAOTest {
     @DisplayName("Test that retrieved record method is the same one as the one the db")
     void testThatRetrievedRecordMethodIsTheSameOneAsTheOneTheDb() {
         employeeDAO.clearHashMap();
-        employeeDAO.populateHashMap("src/main/resources/EmployeeRecordsLarge.csv");
-        EmployeeDTO result = employeeDAO.retrieveRecordsFromSQL(59042);
-        EmployeeDTO expected = employeeDAO.employeesMap.get(59042);
-        System.out.println(result.toString());
+        employeeDAO.csvToHashMap("src/main/resources/EmployeeRecordsLarge.csv");
+        employeeDAO.convertMapToSQL(employeeDAO.employeesMap);
+        String result = employeeDAO.retrieveRecordsFromSQL(916980);
+        EmployeeDTO employeeDTO = employeeDAO.employeesMap.get("916980");
+        System.out.println(result);
+        System.out.println(employeeDAO.employeesMap.size());
 //        Assertions.assertEquals(expected.toString(), result.toString());
     }
 }
