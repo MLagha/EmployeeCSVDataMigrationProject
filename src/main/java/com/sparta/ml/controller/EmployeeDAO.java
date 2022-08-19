@@ -21,6 +21,7 @@ public class EmployeeDAO {
     private final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
     private final Connection postgresConn;
     private final Statement statement;
+    public static double start;
 
     public EmployeeDAO(Connection postgresConn) {
         this.postgresConn = postgresConn;
@@ -84,11 +85,11 @@ public class EmployeeDAO {
         }
     }
 
-
     public void printLargeFileToDB(String filename) {
         try {
             var fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
+            start = System.nanoTime();
             bufferedReader.readLine();
 
             String line;
@@ -167,11 +168,8 @@ public class EmployeeDAO {
         }
     }
 
-
     public void retrieveRecordsFromSQL(int Emp_ID) {
         logger.log(Level.INFO, "Retrieving clean individual records from the database");    //Prints table heading before logger!!!!
-
-
         try {
             ResultSet resultSet = statement.executeQuery(SQLQueries.SELECT);
             System.out.println("Emp ID, " + "Name Prefix, " + "First Name, " + "Middle Initial, " + "Last Name,  " + "Gender, " + "E Mail, " + "Date of Birth, " + "Date of Joining, " + "Salary");

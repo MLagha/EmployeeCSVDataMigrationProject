@@ -9,8 +9,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Runner {
-    public static long start;
-    public static long end;
+    public static float start;
+    public static float end;
     public static void start() {
 
         try{
@@ -30,9 +30,8 @@ public class Runner {
             end = System.nanoTime();
 
             employeeDAO.retrieveRecordsFromSQL(3640);
+
             Display.enterSQLRecords();
-
-
             ConnectionManager.closeConnection();
 
 
