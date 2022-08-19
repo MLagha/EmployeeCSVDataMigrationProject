@@ -9,10 +9,10 @@ import java.util.Map;
 
 public class ThreadedJDBC implements Runnable {
     private final HashMap<String, EmployeeDTO> employees;
-    private final Connection connection;
+    private Connection postgresConn;
     public ThreadedJDBC(HashMap<String, EmployeeDTO> employees) {
         this.employees = employees;
-        this.connection = ConnectionManager.connectToDB();
+        this.postgresConn = ConnectionManager.connectToDB();
     }
 
     @Override
@@ -23,17 +23,16 @@ public class ThreadedJDBC implements Runnable {
 //            emp.insertEmployee(employee, connection);
 //        }
     }
-    static Connection postgresConn = ConnectionManager.connectToDB();
-    static EmployeeDAO employeeDAO = new EmployeeDAO(postgresConn);
-    static Map<String,EmployeeDTO> hMap = employeeDAO.getEmployeesMap();
-    static HashMap<String,EmployeeDTO> halfHMap1 = new HashMap<>();
-    static HashMap<String,EmployeeDTO> halfHMap2 = new HashMap<>();
-    static HashMap<String,EmployeeDTO> halfHMap3 = new HashMap<>();
-    static HashMap<String,EmployeeDTO> halfHMap4 = new HashMap<>();
-    static HashMap<String,EmployeeDTO> halfHMap5 = new HashMap<>();
-    static HashMap<String,EmployeeDTO> halfHMap6 = new HashMap<>();
+    EmployeeDAO employeeDAO = new EmployeeDAO(postgresConn);
+    Map<String,EmployeeDTO> hMap = employeeDAO.getEmployeesMap();
+    HashMap<String,EmployeeDTO> halfHMap1 = new HashMap<>();
+    HashMap<String,EmployeeDTO> halfHMap2 = new HashMap<>();
+    HashMap<String,EmployeeDTO> halfHMap3 = new HashMap<>();
+    HashMap<String,EmployeeDTO> halfHMap4 = new HashMap<>();
+    HashMap<String,EmployeeDTO> halfHMap5 = new HashMap<>();
+    HashMap<String,EmployeeDTO> halfHMap6 = new HashMap<>();
 
-    public static void splitHashMap() {
+    public void splitHashMap() {
         Map<String, EmployeeDTO> newMap = new HashMap<>();
 
 
@@ -57,7 +56,7 @@ public class ThreadedJDBC implements Runnable {
         }
     }
 
-    public static void runThreads() {
+    public void runThreads() {
         float start = System.nanoTime();
 
         try {
