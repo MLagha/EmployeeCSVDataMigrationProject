@@ -9,8 +9,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class Runner {
-    public static long start;
-    public static long end;
+    public static float start;
+    public static float end;
     public static void start() {
 
         try{
@@ -28,9 +28,13 @@ public class Runner {
 
             employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
             end = System.nanoTime();
-            ConnectionManager.closeConnection();
+
+            employeeDAO.retrieveRecordsFromSQL(3640);
+
             Display.enterSQLRecords();
-            //employeeDAO.retrieveRecordsFromSQL();
+            ConnectionManager.closeConnection();
+
+
         } catch (DatabaseMissingException e) {
             throw new RuntimeException(e);
         }
