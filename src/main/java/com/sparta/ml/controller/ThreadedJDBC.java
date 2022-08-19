@@ -30,19 +30,38 @@ public class ThreadedJDBC implements Runnable {
     static Map<String,EmployeeDTO> hMap = employeeDAO.getEmployeesMap();
     static HashMap<String,EmployeeDTO> halfHMap1 = new HashMap<>();
     static HashMap<String,EmployeeDTO> halfHMap2 = new HashMap<>();
+    static HashMap<String,EmployeeDTO> halfHMap3 = new HashMap<>();
+    static HashMap<String,EmployeeDTO> halfHMap4 = new HashMap<>();
+    static HashMap<String,EmployeeDTO> halfHMap5 = new HashMap<>();
+    static HashMap<String,EmployeeDTO> halfHMap6 = new HashMap<>();
+
     public static void splitHashMap() {
+        Map<String, EmployeeDTO> newMap = new HashMap<>();
+
+
         //employeeDAO.populateHashMap("src/main/resources/EmployeeRecordsLarge.csv");
         int count = 0;
         for (Map.Entry<String, EmployeeDTO> entry : hMap.entrySet()) {
-            (count < (hMap.size() / 2) ? halfHMap1 : halfHMap2).put(entry.getKey(), entry.getValue());
+            (count < (hMap.size() / 2) ? halfHMap1 : halfHMap2 ).put(entry.getKey(), entry.getValue());
+            count++;
+        }
+
+        //hMap = halfHMap1;
+        count = 0;
+        for (Map.Entry<String, EmployeeDTO> entry : halfHMap1.entrySet()) {
+            (count < (halfHMap1.size() / 2) ? halfHMap3 : halfHMap4).put(entry.getKey(), entry.getValue());
+            count++;
+        }
+        count = 0;
+        for (Map.Entry<String, EmployeeDTO> entry : halfHMap2.entrySet()) {
+            (count < (halfHMap2.size() / 2) ? halfHMap5 : halfHMap6).put(entry.getKey(), entry.getValue());
             count++;
         }
     }
 
-    public static void main(String[] args) {
-        long start = System.nanoTime();
-        Connection postgresConn = ConnectionManager.connectToDB();
-        EmployeeDAO employeeDAO = new EmployeeDAO(postgresConn);
+    public static void runThreads() {
+        float start = System.nanoTime();
+
         try {
             employeeDAO.createEmployeeTable();
         } catch (SQLException e) {
@@ -50,13 +69,23 @@ public class ThreadedJDBC implements Runnable {
         }
         employeeDAO.populateHashMap("src/main/resources/EmployeeRecords.csv");
         splitHashMap();
-        System.out.println(halfHMap1.size());
-        Thread thread = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap1));
-        Thread thread2 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap2));
-        thread.start();
-        thread2.start();
+
+        System.out.println(halfHMap3.size());
+        System.out.println(halfHMap4.size());
+        System.out.println(halfHMap5.size());
+        System.out.println(halfHMap6.size());
+
+        Thread thread3 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap3));
+        Thread thread4 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap4));
+        Thread thread5 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap5));
+        Thread thread6 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap6));
+        thread3.start();
+        thread4.start();
+        thread5.start();
+        thread6.start();
+
         float end = System.nanoTime();
-        System.out.println("\nTime taken to persist to SQL table before implementing multiple threads: " + (end - start)/1_000_000_000 + " seconds");
+        System.out.println("\nTime taken to persist to SQL table AFTER implementing multiple threads: " + (end - start)/1_000_000_000 + " seconds");
     }
 
 }
