@@ -23,6 +23,7 @@ public class EmployeeDAO {
     public final Map<String, EmployeeDTO> corruptEmployeesMap = new HashMap<>();
     private final Connection postgresConn;
     private final Statement statement;
+    public static double start;
 
     public EmployeeDAO(Connection postgresConn) {
         this.postgresConn = postgresConn;
@@ -55,15 +56,12 @@ public class EmployeeDAO {
                         logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap" +
                                 ", containKey is: " + employeesMap.containsKey(record[0]));
                         employeesMap.put(record[0], employeeDTO);
-//                            writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
                     } else {
                         logger.log(Level.FINE, "duplicate found, record is " + Arrays.toString(record));
                         dupeEmployeesMap.put(record[0], employeeDTO);
-//                            writeToFile("src/main/resources/DuplicateEntries.csv", employeeDTO);
                     }
                 } else {
                     corruptEmployeesMap.put(record[0], employeeDTO);
-//                    writeToFile("src/main/resources/CorruptEntries.csv", employeeDTO);
                 }
             }
             logger.log(Level.INFO, "Reading csv while-loop ends");
@@ -103,6 +101,7 @@ public class EmployeeDAO {
         try {
             var fileReader = new FileReader(filename);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
+            start = System.nanoTime();
             bufferedReader.readLine();
 
             String line;
@@ -175,7 +174,6 @@ public class EmployeeDAO {
         }
     }
 
-
     public void retrieveRecordsFromSQL(int emp_ID) {
             logger.log(Level.INFO, "Retrieving clean individual records from the database");
             PreparedStatement preparedStatement;
@@ -200,6 +198,7 @@ public class EmployeeDAO {
                 preparedStatement.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+
             }
 
         }
