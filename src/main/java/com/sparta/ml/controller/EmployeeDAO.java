@@ -83,6 +83,24 @@ public class EmployeeDAO {
         }
     }
 
+
+    public void printLargeFileToDB(String filename) {
+        try {
+            var fileReader = new FileReader(filename);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            bufferedReader.readLine();
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] record = line.split(",");
+                EmployeeDTO employeeDTO = new EmployeeDTO(record);
+                employeesMap.put(record[0], employeeDTO);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void writeToFile(String fileName, EmployeeDTO employeeDTO) throws IOException {
         BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
         bufferedWriter.write(employeeDTO.toString());
