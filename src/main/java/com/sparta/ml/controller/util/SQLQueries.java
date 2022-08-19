@@ -4,7 +4,7 @@ public interface SQLQueries {
     //String SELECT_ALL = "SELECT * from public.employee_db";
 
 
-    String SELECT = "SELECT ALL * from public.employee_db WHERE Emp_ID = ?";
+    String SELECT = "SELECT * from public.employee_db WHERE Emp_ID = ?";
 
     String DROP_TABLE = "DROP TABLE IF EXISTS public.employee_db";
     String CREATE_TABLE = "CREATE TABLE public.employee_db";
