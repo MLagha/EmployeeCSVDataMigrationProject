@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class EmployeeDAO {
     private static final Logger logger = Logger.getLogger("my logger");
     private static final ConsoleHandler consoleHandler = new ConsoleHandler();
-    public final Map<int, EmployeeDTO> employeesMap = new HashMap<>();
+    public final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
     public final Map<String, EmployeeDTO> dupeEmployeesMap = new HashMap<>();
     public final Map<String, EmployeeDTO> corruptEmployeesMap = new HashMap<>();
     private final Connection postgresConn;
@@ -52,10 +52,10 @@ public class EmployeeDAO {
                 if (DataCorruptionChecker.isValid(record)) {
                     logger.log(Level.FINE, "In if statement to check if record is corrupt, isRecordCorrupt is: "
                             + DataCorruptionChecker.isValid(record));
-                    if (!employeesMap.containsKey(Integer.parseInt(record[0])) {
+                    if (!employeesMap.containsKey(record[0])) {
                         logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap" +
                                 ", containKey is: " + employeesMap.containsKey(record[0]));
-                        employeesMap.put(Integer.parseInt(record[0]), employeeDTO);
+                        employeesMap.put(record[0], employeeDTO);
                     } else {
                         logger.log(Level.FINE, "duplicate found, record is " + Arrays.toString(record));
                         dupeEmployeesMap.put(record[0], employeeDTO);
@@ -176,30 +176,35 @@ public class EmployeeDAO {
     }
 
     public EmployeeDTO retrieveRecordsFromSQL(int emp_ID) {
-            logger.log(Level.INFO, "Retrieving clean individual records from the database");
-            PreparedStatement preparedStatement;
-            ResultSet resultSet;
-            try {
-                preparedStatement = postgresConn.prepareStatement(SQLQueries.SELECT);
-                preparedStatement.setInt(1, emp_ID);
-                resultSet = preparedStatement.executeQuery();
-                String[] record = {resultSet.getString(1)
-                        , resultSet.getString(2)
-                        , resultSet.getString(3)
-                        , resultSet.getString(4)
-                        , resultSet.getString(5)
-                        , resultSet.getString(6)
-                        , resultSet.getString(7)
-                        , resultSet.getString(8)
-                        , resultSet.getString(9)
-                        , resultSet.getString(10)};
-                EmployeeDTO employeeDTO = new EmployeeDTO(record);
-                resultSet.close();
-                preparedStatement.close();
-                return employeeDTO;
-            } catch (SQLException e) {
-                e.printStackTrace();
+        consoleHandler.setLevel(Level.ALL);
+        logger.log(Level.INFO, "Retrieving clean individual records from the database");
+        PreparedStatement preparedStatement;
+        ResultSet resultSet;
+        try {
+            preparedStatement = postgresConn.prepareStatement(SQLQueries.SELECT);
+            preparedStatement.setInt(1, emp_ID);
+            resultSet = preparedStatement.executeQuery();
+            String [] record = new String[10];
+            while (resultSet.next()) {
+                record[0] = resultSet.getString(1);
+                record[1] = resultSet.getString(2);
+                record[2] = resultSet.getString(3);
+                record[3] = resultSet.getString(4);
+                record[4] = resultSet.getString(5);
+                record[5] = resultSet.getString(6);
+                record[6] = resultSet.getString(7);
+                record[7] = resultSet.getString(8);
+                logger.log(Level.FINE, "Record[7] is: " + record[7]);
+                record[8] = resultSet.getString(9);
+                record[9] = resultSet.getString(10);
             }
-            return null;
+            EmployeeDTO employeeDTO = new EmployeeDTO(record);
+            resultSet.close();
+            preparedStatement.close();
+            return employeeDTO;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return null;
+    }
 }
