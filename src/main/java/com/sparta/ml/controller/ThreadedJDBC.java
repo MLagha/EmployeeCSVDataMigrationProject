@@ -67,7 +67,7 @@ public class ThreadedJDBC implements Runnable {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        employeeDAO.populateHashMap("src/main/resources/EmployeeRecordsLarge.csv");
+        employeeDAO.printLargeFileToDB("src/main/resources/EmployeeRecordsLarge.csv");
         splitHashMap();
         System.out.println(halfHMap3.size());
         System.out.println(halfHMap4.size());

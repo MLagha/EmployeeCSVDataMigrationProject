@@ -5,7 +5,7 @@ import com.sparta.ml.controller.ThreadedJDBC;
 
 public class App {
     public static void main(String[] args) {
-        Runner.start();
+        //Runner.start();
         ThreadedJDBC.runThreads();
     }
 }
