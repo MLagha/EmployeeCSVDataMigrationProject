@@ -20,7 +20,7 @@ public class IntegrationTest {
     private void test(){
         Connection postgresConn = ConnectionManager.connectToDB();
         EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
-        employeeDAO.populateHashMap("src/main/resources/EmployeeRecords.csv");
+        employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecords.csv");
         FileReader fileClean = null;
         FileReader fileDup = null;
         FileReader fileCorr = null;

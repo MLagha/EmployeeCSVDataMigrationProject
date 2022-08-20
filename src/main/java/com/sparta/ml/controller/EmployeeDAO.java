@@ -25,6 +25,10 @@ public class EmployeeDAO {
     private final Statement statement;
     public static double start;
 
+    {
+        consoleHandler.setLevel(Level.INFO);
+    }
+
     public EmployeeDAO(Connection postgresConn) {
         this.postgresConn = postgresConn;
         try {
@@ -36,7 +40,7 @@ public class EmployeeDAO {
     public Map<String, EmployeeDTO> getEmployeesMap() {
         return employeesMap;
     }
-    public void populateHashMap(String filename) {
+    public void filterCSVtoHashMap(String filename) {
         consoleHandler.setLevel(Level.INFO);
         logger.setUseParentHandlers(true);
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
@@ -143,7 +147,7 @@ public class EmployeeDAO {
     public void createEmployeeTable() throws SQLException {
         String sqlTable = SQLQueries.DROP_TABLE;
         statement.executeUpdate(sqlTable);
-        logger.log(Level.INFO, "Employee table dropped");
+        logger.log(Level.FINE, "Employee table dropped");
         sqlTable = SQLQueries.CREATE_TABLE + " ( "
                 + "Emp_ID INT NOT NULL, "
                 + "Name_Prefix VARCHAR(255),"
@@ -177,7 +181,7 @@ public class EmployeeDAO {
 
     public String retrieveRecordsFromSQL(int emp_ID) {
         consoleHandler.setLevel(Level.ALL);
-        logger.log(Level.INFO, "Retrieving clean individual records from the database");
+        logger.log(Level.FINE, "Retrieving employee id: " + emp_ID + " records from the database");
         PreparedStatement preparedStatement;
         ResultSet resultSet;
         String employee = "";

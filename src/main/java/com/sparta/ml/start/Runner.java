@@ -17,7 +17,7 @@ public class Runner {
             start = System.nanoTime();
             Connection postgresConn = ConnectionManager.connectToDB();
             EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
-            employeeDAO.populateHashMap("src/main/resources/EmployeeRecordsLarge.csv");
+            employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecordsLarge.csv");
             try {
                 employeeDAO.createEmployeeTable();
             } catch (SQLException e) {
@@ -25,7 +25,7 @@ public class Runner {
             }
             employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
             end = System.nanoTime();
-//            employeeDAO.retrieveRecordsFromSQL(3640);
+            System.out.println(employeeDAO.retrieveRecordsFromSQL(831));
             Display.enterSQLRecords();
             ConnectionManager.closeConnection();
         } catch (DatabaseMissingException e) {

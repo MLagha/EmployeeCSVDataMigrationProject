@@ -6,6 +6,7 @@ public class App {
     public static void main(String[] args) throws InterruptedException {
 
 //        Runner.start();
-        ThreadedJDBC.runThreads();
+//        ThreadedJDBC.runThreads();
+
     }
 }
