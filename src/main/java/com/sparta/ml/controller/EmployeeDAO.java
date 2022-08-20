@@ -128,8 +128,8 @@ public class EmployeeDAO {
 
     public void createEmployeeTable() throws SQLException {
         String sqlTable = SQLQueries.DROP_TABLE;
+        logger.log(Level.INFO, "Employee table dropped");
         statement.executeUpdate(sqlTable);
-        logger.log(Level.FINE, "Employee table dropped");
         sqlTable = SQLQueries.CREATE_TABLE + " ( "
                 + "Emp_ID INT NOT NULL, "
                 + "Name_Prefix VARCHAR(255),"

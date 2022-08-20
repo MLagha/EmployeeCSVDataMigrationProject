@@ -61,16 +61,12 @@ public class ThreadedJDBC {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        //employeeDAO.populateHashMap("src/main/resources/EmployeeRecordsLarge.csv");     //For corrupted files
         employeeDAO.csvToHashMap("src/main/resources/EmployeeRecordsLarge.csv");        //For clean files
         splitHashMap();
-
-
         System.out.println(halfHMap3.size());
         System.out.println(halfHMap4.size());
         System.out.println(halfHMap5.size());
         System.out.println(halfHMap6.size());
-
 
         Thread thread1 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap3));
         Thread thread2 = new Thread(() -> employeeDAO.convertMapToSQL(halfHMap4));

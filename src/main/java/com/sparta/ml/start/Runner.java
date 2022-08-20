@@ -13,9 +13,10 @@ public class Runner {
     public static float end;
     public static void start() {
         start = System.nanoTime();
-        runSmallCSVfilterToSQL();
-//        runLargeCSVtoSQL();
+//        runSmallCSVfilterToSQL();
+        runLargeCSVtoSQL();
         end = System.nanoTime();
+
         System.out.println("Time " + (end - start) / 1_000_000_000);
     }
     private static void runLargeCSVtoSQL() {
