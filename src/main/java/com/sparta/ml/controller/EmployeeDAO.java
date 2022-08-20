@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 public class EmployeeDAO {
     private static final Logger logger = Logger.getLogger("my logger");
     private static final ConsoleHandler consoleHandler = new ConsoleHandler();
+
     public final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
     public final Map<String, EmployeeDTO> dupeEmployeesMap = new HashMap<>();
     public final Map<String, EmployeeDTO> corruptEmployeesMap = new HashMap<>();
@@ -26,8 +27,10 @@ public class EmployeeDAO {
     public static double start;
 
     {
-        logger.setLevel(Level.ALL);
-        consoleHandler.setLevel(Level.ALL);
+        logger.setLevel(Level.FINE);
+        logger.setUseParentHandlers(false);
+        logger.addHandler(consoleHandler);
+        consoleHandler.setLevel(Level.INFO);
     }
 
     public EmployeeDAO(Connection postgresConn) {
@@ -42,7 +45,7 @@ public class EmployeeDAO {
         return employeesMap;
     }
     public void filterCSVtoHashMap(String filename) {
-        logger.setUseParentHandlers(true);
+
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
         try {
             var fileReader = new FileReader(filename);
@@ -50,25 +53,25 @@ public class EmployeeDAO {
             bufferedReader.readLine();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                logger.log(Level.FINE, "In while loop to read csv line. line is: " + line);
+                logger.log(Level.FINER, "In while loop to read csv line. line is: " + line);
                 String[] record = line.split(",");
                 EmployeeDTO employeeDTO = new EmployeeDTO(record);
                 if (DataCorruptionChecker.isValid(record)) {
-                    logger.log(Level.FINE, "In if statement to check if record is corrupt, isRecordCorrupt is: "
+                    logger.log(Level.FINER, "In if statement to check if record is corrupt, isRecordCorrupt is: "
                             + DataCorruptionChecker.isValid(record));
                     if (!employeesMap.containsKey(record[0])) {
-                        logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap" +
+                        logger.log(Level.FINER, "In if statement to check if " + record[0] + " is in HashMap" +
                                 ", containKey is: " + employeesMap.containsKey(record[0]));
                         employeesMap.put(record[0], employeeDTO);
                     } else {
-                        logger.log(Level.FINE, "duplicate found, record is " + Arrays.toString(record));
+                        logger.log(Level.FINER, "duplicate found, record is " + Arrays.toString(record));
                         dupeEmployeesMap.put(record[0], employeeDTO);
                     }
                 } else {
                     corruptEmployeesMap.put(record[0], employeeDTO);
                 }
             }
-            logger.log(Level.INFO, "Reading csv while-loop ends");
+            logger.log(Level.FINE, "Reading csv while-loop ends");
             logger.log(Level.INFO, dupeEmployeesMap.size() + " Duplicate records found");
             logger.log(Level.INFO, corruptEmployeesMap.size() + " Corrupted records found");
             logger.log(Level.INFO, employeesMap.size() + " Unique and clean records left");
