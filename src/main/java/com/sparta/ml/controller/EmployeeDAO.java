@@ -26,7 +26,8 @@ public class EmployeeDAO {
     public static double start;
 
     {
-        consoleHandler.setLevel(Level.INFO);
+        logger.setLevel(Level.ALL);
+        consoleHandler.setLevel(Level.ALL);
     }
 
     public EmployeeDAO(Connection postgresConn) {
@@ -41,7 +42,6 @@ public class EmployeeDAO {
         return employeesMap;
     }
     public void filterCSVtoHashMap(String filename) {
-        consoleHandler.setLevel(Level.INFO);
         logger.setUseParentHandlers(true);
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
         try {
@@ -123,6 +123,25 @@ public class EmployeeDAO {
         }
     }
 
+    public void createEmployeeTable() throws SQLException {
+        String sqlTable = SQLQueries.DROP_TABLE;
+        statement.executeUpdate(sqlTable);
+        logger.log(Level.FINE, "Employee table dropped");
+        sqlTable = SQLQueries.CREATE_TABLE + " ( "
+                + "Emp_ID INT NOT NULL, "
+                + "Name_Prefix VARCHAR(255),"
+                + "First_Name VARCHAR(255),"
+                + "Middle_Initial VARCHAR(255),"
+                + "Last_Name VARCHAR(255),"
+                + "Gender VARCHAR(255),"
+                + "E_Mail VARCHAR(255),"
+                + "Date_of_Birth DATE,"
+                + "Date_of_Joining DATE,"
+                + "Salary VARCHAR(255))";
+        statement.executeUpdate(sqlTable);
+        logger.log(Level.INFO, "Employee table created");
+    }
+
     public void insertEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial
             , String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining
             , String Salary) {
@@ -144,25 +163,6 @@ public class EmployeeDAO {
         }
     }
 
-    public void createEmployeeTable() throws SQLException {
-        String sqlTable = SQLQueries.DROP_TABLE;
-        statement.executeUpdate(sqlTable);
-        logger.log(Level.FINE, "Employee table dropped");
-        sqlTable = SQLQueries.CREATE_TABLE + " ( "
-                + "Emp_ID INT NOT NULL, "
-                + "Name_Prefix VARCHAR(255),"
-                + "First_Name VARCHAR(255),"
-                + "Middle_Initial VARCHAR(255),"
-                + "Last_Name VARCHAR(255),"
-                + "Gender VARCHAR(255),"
-                + "E_Mail VARCHAR(255),"
-                + "Date_of_Birth DATE,"
-                + "Date_of_Joining DATE,"
-                + "Salary VARCHAR(255))";
-        statement.executeUpdate(sqlTable);
-        logger.log(Level.INFO, "Employee table created");
-    }
-
     public void convertMapToSQL(Map<String, EmployeeDTO> employees) {
         for (Map.Entry<String, EmployeeDTO> set: employees.entrySet()) {
             insertEmployeeRecordDb(Integer.parseInt(
@@ -180,7 +180,6 @@ public class EmployeeDAO {
     }
 
     public String retrieveRecordsFromSQL(int emp_ID) {
-        consoleHandler.setLevel(Level.ALL);
         logger.log(Level.FINE, "Retrieving employee id: " + emp_ID + " records from the database");
         PreparedStatement preparedStatement;
         ResultSet resultSet;

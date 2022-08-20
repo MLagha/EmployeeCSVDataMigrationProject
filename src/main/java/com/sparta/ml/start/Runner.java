@@ -12,25 +12,35 @@ public class Runner {
     public static float start;
     public static float end;
     public static void start() {
-
-        try{
-            start = System.nanoTime();
-            Connection postgresConn = ConnectionManager.connectToDB();
-            EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
-            employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecordsLarge.csv");
-            try {
-                employeeDAO.createEmployeeTable();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
-            end = System.nanoTime();
-            System.out.println(employeeDAO.retrieveRecordsFromSQL(831));
-            Display.enterSQLRecords();
-            ConnectionManager.closeConnection();
-        } catch (DatabaseMissingException e) {
+        start = System.nanoTime();
+        runSmallCSVfilterToSQL();
+        runLargeCSVtoSQL();
+        end = System.nanoTime();
+        System.out.println("Time " + (end - start) / 1_000_000_000);
+    }
+    private static void runLargeCSVtoSQL() {
+        Connection postgresConn = ConnectionManager.connectToDB();
+        EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
+        employeeDAO.csvToHashMap("src/main/resources/EmployeeRecordsLarge.csv");
+        try {
+            employeeDAO.createEmployeeTable();
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
+        ConnectionManager.closeConnection();
+    }
 
+    private static void runSmallCSVfilterToSQL() {
+        Connection postgresConn = ConnectionManager.connectToDB();
+        EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
+        employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecords.csv");
+        try {
+            employeeDAO.createEmployeeTable();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
+        ConnectionManager.closeConnection();
     }
 }
