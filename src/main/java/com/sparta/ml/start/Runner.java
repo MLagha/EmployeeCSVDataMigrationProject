@@ -25,7 +25,9 @@ public class Runner {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        employeeDAO.populateHashMap("src/main/resources/EmployeeRecords.csv");
+        employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecords.csv");               //Single-thread corrupted data
+        employeeDAO.csvToHashMap("src/main/resources/EmployeeRecordsLarge.csv");            //Single-thread clean data
+
         employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
 
         //employeeDAO.retrieveRecordsFromSQL(3640);
