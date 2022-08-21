@@ -7,12 +7,24 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ThreadedJDBC {
+    private static final Logger logger = Logger.getLogger("my logger");
+    private static final ConsoleHandler consoleHandler = new ConsoleHandler();
     private static float start;
     private static float end;
     private final HashMap<String, EmployeeDTO> employees;
     private final Connection connection;
+    {
+        logger.setLevel(Level.FINE);
+        logger.setUseParentHandlers(false);
+        logger.addHandler(consoleHandler);
+        consoleHandler.setLevel(Level.INFO);
+    }
+
     static Connection postgresConn = ConnectionManager.connectToDB();
     static EmployeeDAO employeeDAO = new EmployeeDAO(postgresConn);
     public static Map<String,EmployeeDTO> mainMap = employeeDAO.getEmployeesMap();
@@ -67,6 +79,8 @@ public class ThreadedJDBC {
         ConnectionManager.closeConnection();
         end = System.nanoTime();
         Display.enterSQLRecords();
+
         System.out.println("\nTime spent in sending unique and clean records to database in multiple threads is: " + (ThreadedJDBC.end - ThreadedJDBC.start)/1_000_000_000 + " seconds");
+        logger.log(Level.INFO,"Multi-thread large csv to database time: "
     }
 }

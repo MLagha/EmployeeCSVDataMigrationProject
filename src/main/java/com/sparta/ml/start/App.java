@@ -7,6 +7,5 @@ public class App {
 
         //Runner.start();                   //For Single thread
         ThreadedJDBC.runThreads();          //For Multithreading
-
     }
 }

@@ -7,8 +7,12 @@ import com.sparta.ml.exceptions.DatabaseMissingException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Runner {
+
     private static float start;
     private static float end;
     static Connection postgresConn = ConnectionManager.connectToDB();

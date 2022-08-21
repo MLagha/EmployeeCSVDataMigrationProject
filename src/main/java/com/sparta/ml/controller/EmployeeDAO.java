@@ -28,6 +28,13 @@ public class EmployeeDAO {
     public static int NoOfCorruptedRecords;
     public static int NoOfUniqueCleanRecords;
 
+    {
+        logger.setLevel(Level.FINE);
+        logger.setUseParentHandlers(false);
+        logger.addHandler(consoleHandler);
+        consoleHandler.setLevel(Level.INFO);
+    }
+
     public EmployeeDAO(Connection postgresConn) {
         this.postgresConn = postgresConn;
         try {
@@ -39,7 +46,8 @@ public class EmployeeDAO {
     public Map<String, EmployeeDTO> getEmployeesMap() {
         return employeesMap;
     }
-    public void populateHashMap(String filename) {
+
+    public void filterCSVtoHashMap(String filename) {
         consoleHandler.setLevel(Level.INFO);
         logger.setUseParentHandlers(true);
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
@@ -49,47 +57,57 @@ public class EmployeeDAO {
             bufferedReader.readLine();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                logger.log(Level.FINE, "In while loop to read csv line. line is: " + line);
+                logger.log(Level.FINER, "In while loop to read csv line. line is: " + line);
                 String[] record = line.split(",");
                 EmployeeDTO employeeDTO = new EmployeeDTO(record);
                 if (DataCorruptionChecker.isValid(record)) {
-                    logger.log(Level.FINE, "In if statement to check if record is corrupt, isRecordCorrupt is: "
+                    logger.log(Level.FINER, "In if statement to check if record is corrupt, isRecordCorrupt is: "
                             + DataCorruptionChecker.isValid(record));
                     if (!employeesMap.containsKey(record[0])) {
-                        logger.log(Level.FINE, "In if statement to check if " + record[0] + " is in HashMap" +
+                        logger.log(Level.FINER, "In if statement to check if " + record[0] + " is in HashMap" +
                                 ", containKey is: " + employeesMap.containsKey(record[0]));
                         employeesMap.put(record[0], employeeDTO);
-                        writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
-
                     } else {
-                        logger.log(Level.FINE, "duplicate found, record is " + Arrays.toString(record));
+                        logger.log(Level.FINER, "duplicate found, record is " + Arrays.toString(record));
                         dupeEmployeesMap.put(record[0], employeeDTO);
-                        writeToFile("src/main/resources/DuplicateEntries.csv", employeeDTO);
-
                     }
                 } else {
                     corruptEmployeesMap.put(record[0], employeeDTO);
-                    writeToFile("src/main/resources/CorruptEntries.csv", employeeDTO);
-
                 }
             }
-            NoOfDuplicateRecords = dupeEmployeesMap.size();
-            NoOfCorruptedRecords = corruptEmployeesMap.size();
-            NoOfUniqueCleanRecords = employeesMap.size();
-
-            logger.log(Level.INFO, "Reading csv while-loop ends");
-            logger.log(Level.INFO, NoOfDuplicateRecords + " Duplicate records found");
-            logger.log(Level.INFO, NoOfCorruptedRecords + " Corrupted records found");
-            logger.log(Level.INFO, NoOfUniqueCleanRecords + " Unique and clean records left");
+            logger.log(Level.FINE, "Reading csv while-loop ends");
+            logger.log(Level.INFO, dupeEmployeesMap.size() + " Duplicate records found");
+            logger.log(Level.INFO, corruptEmployeesMap.size() + " Corrupted records found");
+            logger.log(Level.INFO, employeesMap.size() + " Unique and clean records left");
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
     }
 
+    public void clearHashMap() {
+        employeesMap.clear();
+    }
 
-    private void writeToFile(String fileName, EmployeeDTO employeeDTO) throws IOException {
-        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
-        bufferedWriter.write(employeeDTO.toString());
+    public void writeToFile() throws IOException {
+        FileWriter fileWriter = new FileWriter("src/main/resources/DuplicateEntries.csv", true);
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        for (Map.Entry<String, EmployeeDTO> set: dupeEmployeesMap.entrySet()) {
+            bufferedWriter.write(set.toString());
+        }
+        bufferedWriter.close();
+
+        fileWriter = new FileWriter("src/main/resources/CorruptEntries.csv", true);
+        bufferedWriter = new BufferedWriter(fileWriter);
+        for (Map.Entry<String, EmployeeDTO> set: corruptEmployeesMap.entrySet()) {
+            bufferedWriter.write(set.toString());
+        }
+        bufferedWriter.close();
+
+        fileWriter = new FileWriter("src/main/resources/CleanEntries.csv",true);
+        bufferedWriter = new BufferedWriter(fileWriter);
+        for (Map.Entry<String, EmployeeDTO> set: employeesMap.entrySet()) {
+            bufferedWriter.write(set.toString());
+        }
         bufferedWriter.close();
     }
 
@@ -111,33 +129,10 @@ public class EmployeeDAO {
         }
     }
 
-    public void insertEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial
-            , String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining
-            , String Salary) {
-
-        try {
-            PreparedStatement preparedStatement = postgresConn.prepareStatement(SQLQueries.INSERT_INTO_DB);
-            preparedStatement.setInt(1, Emp_ID);
-            preparedStatement.setString(2, Name_Prefix);
-            preparedStatement.setString(3, First_Name);
-            preparedStatement.setString(4, Middle_Initial);
-            preparedStatement.setString(5, Last_Name);
-            preparedStatement.setString(6, Gender);
-            preparedStatement.setString(7, E_Mail);
-            preparedStatement.setDate(8, Date.valueOf(Date_of_Birth));
-            preparedStatement.setDate(9, Date.valueOf(Date_of_Joining));
-            preparedStatement.setString(10, Salary);
-
-            preparedStatement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void createEmployeeTable() throws SQLException {
         String sqlTable = SQLQueries.DROP_TABLE;
-        statement.executeUpdate(sqlTable);
         logger.log(Level.INFO, "Employee table dropped");
+        statement.executeUpdate(sqlTable);
         sqlTable = SQLQueries.CREATE_TABLE + " ( "
                 + "Emp_ID INT NOT NULL, "
                 + "Name_Prefix VARCHAR(255),"
@@ -151,6 +146,27 @@ public class EmployeeDAO {
                 + "Salary VARCHAR(255))";
         statement.executeUpdate(sqlTable);
         logger.log(Level.INFO, "Employee table created");
+    }
+
+    public void insertEmployeeRecordDb(int Emp_ID, String Name_Prefix, String First_Name, String Middle_Initial
+            , String Last_Name, String Gender, String E_Mail, LocalDate Date_of_Birth, LocalDate Date_of_Joining
+            , String Salary) {
+        try {
+            PreparedStatement preparedStatement = postgresConn.prepareStatement(SQLQueries.INSERT_INTO_DB);
+            preparedStatement.setInt(1, Emp_ID);
+            preparedStatement.setString(2, Name_Prefix);
+            preparedStatement.setString(3, First_Name);
+            preparedStatement.setString(4, Middle_Initial);
+            preparedStatement.setString(5, Last_Name);
+            preparedStatement.setString(6, Gender);
+            preparedStatement.setString(7, E_Mail);
+            preparedStatement.setDate(8, Date.valueOf(Date_of_Birth));
+            preparedStatement.setDate(9, Date.valueOf(Date_of_Joining));
+            preparedStatement.setString(10, Salary);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void convertMapToSQL(Map<String, EmployeeDTO> employees) {
@@ -169,32 +185,35 @@ public class EmployeeDAO {
         }
     }
 
-    public void retrieveRecordsFromSQL(int emp_ID) {
-        consoleHandler.setLevel(Level.ALL);
-        logger.log(Level.INFO, "Retrieving clean individual records from the database");
+    public String retrieveRecordsFromSQL(int emp_ID) {
+        logger.log(Level.FINE, "Retrieving employee id: " + emp_ID + " records from the database");
         PreparedStatement preparedStatement;
         ResultSet resultSet;
+        String employee = "";
         try {
             preparedStatement = postgresConn.prepareStatement(SQLQueries.SELECT);
             preparedStatement.setInt(1, emp_ID);
             resultSet = preparedStatement.executeQuery();
+            
             System.out.println("\nEmp ID, " + "Name Prefix, " + "First Name, " + "Middle Initial, " + "Last Name,  " + "Gender, " + "E Mail, " + "Date of Birth, " + "Date of Joining, " + "Salary");
             while (resultSet.next()) {
-                System.out.println(resultSet.getString(1)
-                        + ", " + resultSet.getString(2)
-                        + ", " + resultSet.getString(3)
-                        + ", " + resultSet.getString(4)
-                        + ", " + resultSet.getString(5)
-                        + ", " + resultSet.getString(6)
-                        + ", " + resultSet.getString(7)
-                        + ", " + resultSet.getString(8)
-                        + ", " + resultSet.getString(9)
-                        + ", " + resultSet.getString(10));
+                employee = resultSet.getString(1) + " "
+                + resultSet.getString(2) + " "
+                + resultSet.getString(3) + " "
+                + resultSet.getString(4) + " "
+                + resultSet.getString(5) + " "
+                + resultSet.getString(6) + " "
+                + resultSet.getString(7) + " "
+                + resultSet.getString(8) + " "
+                + resultSet.getString(9) + " "
+                + resultSet.getString(10);
             }
             resultSet.close();
             preparedStatement.close();
+            return employee;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return employee;
     }
 }

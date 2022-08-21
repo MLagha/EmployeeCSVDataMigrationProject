@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class EmployeeDTO {
-    private final Integer empID;
+    private final int empID;
     private final String namePrefix;
     private final String firstName;
     private final String middleInitial;
@@ -15,7 +15,7 @@ public class EmployeeDTO {
     private final LocalDate dateOfJoining;
     private final String salary;
 
-    public EmployeeDTO(String [] csvInput) {
+    public EmployeeDTO(String[] csvInput) {
         this.empID = Integer.parseInt(csvInput[0]);
         this.namePrefix = csvInput[1];
         this.firstName = csvInput[2];
@@ -28,7 +28,7 @@ public class EmployeeDTO {
         this.salary = csvInput[9];
     }
 
-    public Integer getEmpID() {
+    public int getEmpID() {
         return empID;
     }
 
