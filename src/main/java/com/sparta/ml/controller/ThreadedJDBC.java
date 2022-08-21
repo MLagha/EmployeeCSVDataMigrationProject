@@ -7,12 +7,23 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ThreadedJDBC {
+    private static final Logger logger = Logger.getLogger("my logger");
+    private static final ConsoleHandler consoleHandler = new ConsoleHandler();
     public static float start;
     public static float end;
     private final HashMap<String, EmployeeDTO> employees;
     private final Connection connection;
+    {
+        logger.setLevel(Level.FINE);
+        logger.setUseParentHandlers(false);
+        logger.addHandler(consoleHandler);
+        consoleHandler.setLevel(Level.INFO);
+    }
     public ThreadedJDBC(HashMap<String, EmployeeDTO> employees) {
         this.employees = employees;
         this.connection = ConnectionManager.connectToDB();
@@ -87,6 +98,8 @@ public class ThreadedJDBC {
         Display.enterSQLRecords();
 
         System.out.println("\nTime taken to persist to SQL table AFTER implementing multiple threads: " + (end - start)/1_000_000_000 + " seconds");
+        logger.log(Level.INFO,"Multi-thread large csv to database time: "
+                + (end - start) / 1_000_000_000 + " seconds");
     }
 
 }

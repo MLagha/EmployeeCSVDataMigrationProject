@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -65,4 +66,5 @@ public class EmployeeDAOTest {
         String expected = "65499 Mrs. Tamekia Y Mccutcheon F tamekia.mccutcheon@hotmail.com 1982-12-22 2011-01-13 190296";
         Assertions.assertEquals(expected, result);
     }
+
 }
