@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class EmployeeDTO {
-    private final String empID;
+    private final Integer empID;
     private final String namePrefix;
     private final String firstName;
     private final String middleInitial;
@@ -16,7 +16,7 @@ public class EmployeeDTO {
     private final String salary;
 
     public EmployeeDTO(String [] csvInput) {
-        this.empID = csvInput[0];
+        this.empID = Integer.parseInt(csvInput[0]);
         this.namePrefix = csvInput[1];
         this.firstName = csvInput[2];
         this.middleInitial = csvInput[3];
@@ -28,7 +28,7 @@ public class EmployeeDTO {
         this.salary = csvInput[9];
     }
 
-    public String getEmpID() {
+    public Integer getEmpID() {
         return empID;
     }
 
@@ -70,15 +70,15 @@ public class EmployeeDTO {
 
     @Override
     public String toString() {
-        return "EmployeeID" + empID +
-                "namePrefix='" + namePrefix + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", middleInitial='" + middleInitial + '\'' +
-                ", LastName='" + lastName + '\'' +
-                ", gender='" + gender + '\'' +
-                ", email='" + email + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", dateOfJoining=" + dateOfJoining +
-                ", salary=" + salary + "\n";
+        return " " + empID +
+                ", " + namePrefix + '\'' +
+                ", " + firstName + '\'' +
+                ", " + middleInitial + '\'' +
+                ", " + lastName + '\'' +
+                ", " + gender + '\'' +
+                ", " + email + '\'' +
+                ", " + dateOfBirth +
+                ", " + dateOfJoining +
+                ", " + salary + "\n";
     }
 }
