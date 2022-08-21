@@ -70,15 +70,15 @@ public class EmployeeDTO {
 
     @Override
     public String toString() {
-        return "EmployeeID" + empID +
-                "namePrefix='" + namePrefix + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", middleInitial='" + middleInitial + '\'' +
-                ", LastName='" + lastName + '\'' +
-                ", gender='" + gender + '\'' +
-                ", email='" + email + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", dateOfJoining=" + dateOfJoining +
-                ", salary=" + salary + "\n";
+        return " " + empID +
+                ", " + namePrefix + '\'' +
+                ", " + firstName + '\'' +
+                ", " + middleInitial + '\'' +
+                ", " + lastName + '\'' +
+                ", " + gender + '\'' +
+                ", " + email + '\'' +
+                ", " + dateOfBirth +
+                ", " + dateOfJoining +
+                ", " + salary + "\n";
     }
 }

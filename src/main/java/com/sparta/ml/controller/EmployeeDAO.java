@@ -18,13 +18,15 @@ import java.util.logging.Logger;
 public class EmployeeDAO {
     private static final Logger logger = Logger.getLogger("my logger");
     private static final ConsoleHandler consoleHandler = new ConsoleHandler();
-
     public final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
     public final Map<String, EmployeeDTO> dupeEmployeesMap = new HashMap<>();
     public final Map<String, EmployeeDTO> corruptEmployeesMap = new HashMap<>();
     private final Connection postgresConn;
     private final Statement statement;
     public static double start;
+    public static int NoOfDuplicateRecords;
+    public static int NoOfCorruptedRecords;
+    public static int NoOfUniqueCleanRecords;
 
     {
         logger.setLevel(Level.FINE);
@@ -44,8 +46,10 @@ public class EmployeeDAO {
     public Map<String, EmployeeDTO> getEmployeesMap() {
         return employeesMap;
     }
-    public void filterCSVtoHashMap(String filename) {
 
+    public void filterCSVtoHashMap(String filename) {
+        consoleHandler.setLevel(Level.INFO);
+        logger.setUseParentHandlers(true);
         logger.log(Level.FINE,"Method populateHashMap started " + filename+ " is passed to parameter");
         try {
             var fileReader = new FileReader(filename);
@@ -106,7 +110,6 @@ public class EmployeeDAO {
         }
         bufferedWriter.close();
     }
-
 
     public void csvToHashMap(String filename) {
         try {
@@ -191,6 +194,8 @@ public class EmployeeDAO {
             preparedStatement = postgresConn.prepareStatement(SQLQueries.SELECT);
             preparedStatement.setInt(1, emp_ID);
             resultSet = preparedStatement.executeQuery();
+            
+            System.out.println("\nEmp ID, " + "Name Prefix, " + "First Name, " + "Middle Initial, " + "Last Name,  " + "Gender, " + "E Mail, " + "Date of Birth, " + "Date of Joining, " + "Salary");
             while (resultSet.next()) {
                 employee = resultSet.getString(1) + " "
                 + resultSet.getString(2) + " "

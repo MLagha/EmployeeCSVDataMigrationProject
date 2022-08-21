@@ -12,52 +12,27 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Runner {
-    private static final Logger logger = Logger.getLogger("my logger");
-    private static final ConsoleHandler consoleHandler = new ConsoleHandler();
-    public static float start;
-    public static float end;
-    {
-        logger.setLevel(Level.FINE);
-        logger.setUseParentHandlers(false);
-        logger.addHandler(consoleHandler);
-        consoleHandler.setLevel(Level.INFO);
-    }
+
+    private static float start;
+    private static float end;
+    static Connection postgresConn = ConnectionManager.connectToDB();
+    static EmployeeDAO employeeDAO = new EmployeeDAO(postgresConn);
+
     public static void start() {
         start = System.nanoTime();
-//        runSmallCSVfilterToSQL();
-        runLargeCSVtoSQL();
+        try{
+            employeeDAO.createEmployeeTable();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        employeeDAO.populateHashMap("src/main/resources/EmployeeRecords.csv");
+        employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
+
+        //employeeDAO.retrieveRecordsFromSQL(3640);
+
+        ConnectionManager.closeConnection();
         end = System.nanoTime();
-    }
-
-    private static void runLargeCSVtoSQL() {
-        Connection postgresConn = ConnectionManager.connectToDB();
-        EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
-        employeeDAO.csvToHashMap("src/main/resources/EmployeeRecordsLarge.csv");
-        try {
-            employeeDAO.createEmployeeTable();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
-        ConnectionManager.closeConnection();
-        float LargeCSVEnd = System.nanoTime();
-        logger.log(Level.INFO,"Single thread clean large csv to database time: "
-                + (LargeCSVEnd - start) / 1_000_000_000 + " seconds");
-    }
-
-    private static void runSmallCSVfilterToSQL() {
-        Connection postgresConn = ConnectionManager.connectToDB();
-        EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
-        employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecords.csv");
-        try {
-            employeeDAO.createEmployeeTable();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
-        ConnectionManager.closeConnection();
-        float smallCSVEnd = System.nanoTime();
-        logger.log(Level.INFO,"Single thread filter and clean small csv to database time: "
-                + (smallCSVEnd - start) / 1_000_000_000 + " seconds");
+        Display.enterSQLRecords();
+        System.out.println("\nTime spent in sending unique and clean records to database in a single thread is: " + (Runner.end - Runner.start)/1_000_000_000 + " seconds");
     }
 }

@@ -15,8 +15,6 @@ public class IntegrationTest {
     File duplicateEntries = new File ("src/main/resources/DuplicateEntries.csv");
     File corruptEntries = new File ("src/main/resources/CorruptEntries.csv");
 
-
-
     private void test(){
         Connection postgresConn = ConnectionManager.connectToDB();
         EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
