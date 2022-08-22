@@ -25,7 +25,7 @@ public class Runner {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        employeeDAO.populateHashMap("src/main/resources/EmployeeRecords.csv");
+        employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecords.csv");
         employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
 
         //employeeDAO.retrieveRecordsFromSQL(3640);

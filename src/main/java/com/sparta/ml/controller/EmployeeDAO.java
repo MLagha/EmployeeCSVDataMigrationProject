@@ -18,9 +18,9 @@ import java.util.logging.Logger;
 public class EmployeeDAO {
     private static final Logger logger = Logger.getLogger("my logger");
     private static final ConsoleHandler consoleHandler = new ConsoleHandler();
-    public final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
-    public final Map<String, EmployeeDTO> dupeEmployeesMap = new HashMap<>();
-    public final Map<String, EmployeeDTO> corruptEmployeesMap = new HashMap<>();
+    public static final Map<String, EmployeeDTO> employeesMap = new HashMap<>();
+    public static final Map<String, EmployeeDTO> dupeEmployeesMap = new HashMap<>();
+    public static final Map<String, EmployeeDTO> corruptEmployeesMap = new HashMap<>();
     private final Connection postgresConn;
     private final Statement statement;
     public static double start;
@@ -88,7 +88,7 @@ public class EmployeeDAO {
         employeesMap.clear();
     }
 
-    public void writeToFile() throws IOException {
+    public static void writeToFile() throws IOException {
         FileWriter fileWriter = new FileWriter("src/main/resources/DuplicateEntries.csv", true);
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
         for (Map.Entry<String, EmployeeDTO> set: dupeEmployeesMap.entrySet()) {

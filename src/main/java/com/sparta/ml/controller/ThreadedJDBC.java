@@ -81,6 +81,6 @@ public class ThreadedJDBC {
         Display.enterSQLRecords();
 
         System.out.println("\nTime spent in sending unique and clean records to database in multiple threads is: " + (ThreadedJDBC.end - ThreadedJDBC.start)/1_000_000_000 + " seconds");
-        logger.log(Level.INFO,"Multi-thread large csv to database time: "
+        logger.log(Level.INFO,"Multi-thread large csv to database time: ");
     }
 }
