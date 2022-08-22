@@ -26,7 +26,7 @@ public class Runner {
 
         employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
 
-        //employeeDAO.retrieveRecordsFromSQL(3640);
+        employeeDAO.retrieveRecordsFromSQL(3640);
 
         ConnectionManager.closeConnection();
         end = System.nanoTime();

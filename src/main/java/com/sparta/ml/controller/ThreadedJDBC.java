@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ThreadedJDBC {
@@ -20,7 +21,7 @@ public class ThreadedJDBC {
     static EmployeeDAO employeeDAO = new EmployeeDAO(postgresConn);
     public static Map<String,EmployeeDTO> mainMap = employeeDAO.getEmployeesMap();
     static HashMap<String,EmployeeDTO> subMap = new HashMap<>();
-    /*
+
     {
         logger.setLevel(Level.FINE);
         logger.setUseParentHandlers(false);
@@ -28,7 +29,7 @@ public class ThreadedJDBC {
         consoleHandler.setLevel(Level.INFO);
     }
 
-     */
+
 
     public ThreadedJDBC(HashMap<String, EmployeeDTO> employees) {
         this.employees = employees;
@@ -45,6 +46,7 @@ public class ThreadedJDBC {
 
         //employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecords.csv");               //Multithreading corrupted data
         employeeDAO.csvToHashMap("src/main/resources/EmployeeRecordsLarge.csv");            //Multithreading clean data
+
 
         int NoOfThreads = 4;
         int subMapSize = mainMap.size()/NoOfThreads;
@@ -63,7 +65,7 @@ public class ThreadedJDBC {
 
                 if (subMapCounter == subMapSize || subsTotalSizeCounter == mainMap.size()) {
                     subMapCounter = 0;
-                    //System.out.println(subMap.size());
+                    System.out.println(subMap.size());
 
                     Thread thread = new Thread(() -> employeeDAO.convertMapToSQL(subMap));
                     thread.start();
