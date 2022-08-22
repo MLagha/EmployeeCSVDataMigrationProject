@@ -2,13 +2,15 @@ package com.sparta.ml;
 
 import com.sparta.ml.controller.ConnectionManager;
 import com.sparta.ml.controller.EmployeeDAO;
+import com.sparta.ml.start.Runner;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.sql.Connection;
+import java.sql.SQLException;
 
-//setup //test //teardown
 public class IntegrationTest {
 
     File cleanEntries = new File("src/main/resources/CleanEntries.csv");
@@ -20,7 +22,20 @@ public class IntegrationTest {
     private void test(){
         Connection postgresConn = ConnectionManager.connectToDB();
         EmployeeDAO employeeDAO  = new EmployeeDAO(postgresConn);
-        employeeDAO.populateHashMap("src/main/resources/EmployeeRecords.csv");
+        employeeDAO.filterCSVtoHashMap("src/test/resources/MockData.csv");
+        try {
+            employeeDAO.createEmployeeTable();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            EmployeeDAO.writeToFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
+        System.out.println(employeeDAO.retrieveRecordsFromSQL(4423));
+        ConnectionManager.closeConnection();
         FileReader fileClean = null;
         FileReader fileDup = null;
         FileReader fileCorr = null;
@@ -50,9 +65,13 @@ public class IntegrationTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         //check if files exist
         //check if records are correct
         //check if output seems right?
+
+
+
     }
 
     private void tearDown() {
@@ -66,8 +85,11 @@ public class IntegrationTest {
     @DisplayName("Given a csv, separate corruptions,duplicates and clean data")
     void givenACsvSeparateCorruptionsDuplicatesAndCleanData() {
         test();
-        tearDown();
+//        tearDown();
+
     }
+
+
 
 
 }
