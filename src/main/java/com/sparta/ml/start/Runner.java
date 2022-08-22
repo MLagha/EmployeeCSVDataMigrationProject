@@ -3,13 +3,9 @@ package com.sparta.ml.start;
 import com.sparta.ml.controller.ConnectionManager;
 import com.sparta.ml.controller.EmployeeDAO;
 import com.sparta.ml.display.Display;
-import com.sparta.ml.exceptions.DatabaseMissingException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Runner {
 
@@ -25,10 +21,13 @@ public class Runner {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecords.csv");
+
+        employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecords.csv");               //Single-thread corrupted data
+        //employeeDAO.csvToHashMap("src/main/resources/EmployeeRecordsLarge.csv");            //Single-thread clean data
+
         employeeDAO.convertMapToSQL(employeeDAO.getEmployeesMap());
 
-        //employeeDAO.retrieveRecordsFromSQL(3640);
+        employeeDAO.retrieveRecordsFromSQL(3640);
 
         ConnectionManager.closeConnection();
         end = System.nanoTime();

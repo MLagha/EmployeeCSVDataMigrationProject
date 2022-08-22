@@ -5,8 +5,7 @@ import com.sparta.ml.model.EmployeeDTO;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +17,11 @@ public class ThreadedJDBC {
     private static float end;
     private final HashMap<String, EmployeeDTO> employees;
     private final Connection connection;
+    static Connection postgresConn = ConnectionManager.connectToDB();
+    static EmployeeDAO employeeDAO = new EmployeeDAO(postgresConn);
+    public static Map<String,EmployeeDTO> mainMap = employeeDAO.getEmployeesMap();
+    static HashMap<String,EmployeeDTO> subMap = new HashMap<>();
+
     {
         logger.setLevel(Level.FINE);
         logger.setUseParentHandlers(false);
@@ -25,10 +29,7 @@ public class ThreadedJDBC {
         consoleHandler.setLevel(Level.INFO);
     }
 
-    static Connection postgresConn = ConnectionManager.connectToDB();
-    static EmployeeDAO employeeDAO = new EmployeeDAO(postgresConn);
-    public static Map<String,EmployeeDTO> mainMap = employeeDAO.getEmployeesMap();
-    static HashMap<String,EmployeeDTO> subMap = new HashMap<>();
+
 
     public ThreadedJDBC(HashMap<String, EmployeeDTO> employees) {
         this.employees = employees;
@@ -43,8 +44,9 @@ public class ThreadedJDBC {
             throw new RuntimeException(e);
         }
 
-        //employeeDAO.populateHashMap("src/main/resources/EmployeeRecordsLarge.csv");               //Multithreading corrupted data
+        //employeeDAO.filterCSVtoHashMap("src/main/resources/EmployeeRecords.csv");               //Multithreading corrupted data
         employeeDAO.csvToHashMap("src/main/resources/EmployeeRecordsLarge.csv");            //Multithreading clean data
+
 
         int NoOfThreads = 4;
         int subMapSize = mainMap.size()/NoOfThreads;
@@ -74,13 +76,12 @@ public class ThreadedJDBC {
             }
         }
 
-        //employeeDAO.retrieveRecordsFromSQL(3640);
+        employeeDAO.retrieveRecordsFromSQL(3640);
 
         ConnectionManager.closeConnection();
         end = System.nanoTime();
         Display.enterSQLRecords();
 
         System.out.println("\nTime spent in sending unique and clean records to database in multiple threads is: " + (ThreadedJDBC.end - ThreadedJDBC.start)/1_000_000_000 + " seconds");
-        logger.log(Level.INFO,"Multi-thread large csv to database time: ");
     }
 }
