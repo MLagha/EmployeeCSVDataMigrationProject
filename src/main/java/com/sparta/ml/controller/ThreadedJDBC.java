@@ -5,10 +5,8 @@ import com.sparta.ml.model.EmployeeDTO;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ThreadedJDBC {
@@ -31,6 +29,7 @@ public class ThreadedJDBC {
     }
 
      */
+
     public ThreadedJDBC(HashMap<String, EmployeeDTO> employees) {
         this.employees = employees;
         this.connection = ConnectionManager.connectToDB();
@@ -64,7 +63,7 @@ public class ThreadedJDBC {
 
                 if (subMapCounter == subMapSize || subsTotalSizeCounter == mainMap.size()) {
                     subMapCounter = 0;
-                    System.out.println(subMap.size());
+                    //System.out.println(subMap.size());
 
                     Thread thread = new Thread(() -> employeeDAO.convertMapToSQL(subMap));
                     thread.start();
@@ -75,7 +74,7 @@ public class ThreadedJDBC {
             }
         }
 
-        //employeeDAO.retrieveRecordsFromSQL(3640);
+        employeeDAO.retrieveRecordsFromSQL(3640);
 
         ConnectionManager.closeConnection();
         end = System.nanoTime();

@@ -6,11 +6,10 @@ import com.sparta.ml.controller.util.SQLQueries;
 
 import java.io.*;
 import java.sql.*;
+import java.sql.Date;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,14 +66,21 @@ public class EmployeeDAO {
                         logger.log(Level.FINER, "In if statement to check if " + record[0] + " is in HashMap" +
                                 ", containKey is: " + employeesMap.containsKey(record[0]));
                         employeesMap.put(record[0], employeeDTO);
+                        writeToFile("src/main/resources/CleanEntries.csv", employeeDTO);
                     } else {
                         logger.log(Level.FINER, "duplicate found, record is " + Arrays.toString(record));
                         dupeEmployeesMap.put(record[0], employeeDTO);
+                        writeToFile("src/main/resources/DuplicateEntries.csv", employeeDTO);
                     }
                 } else {
                     corruptEmployeesMap.put(record[0], employeeDTO);
+                    writeToFile("src/main/resources/CorruptEntries.csv", employeeDTO);
                 }
             }
+            NoOfDuplicateRecords = dupeEmployeesMap.size();
+            NoOfCorruptedRecords = corruptEmployeesMap.size();
+            NoOfUniqueCleanRecords = employeesMap.size();
+
             logger.log(Level.FINE, "Reading csv while-loop ends");
             logger.log(Level.INFO, dupeEmployeesMap.size() + " Duplicate records found");
             logger.log(Level.INFO, corruptEmployeesMap.size() + " Corrupted records found");
@@ -88,6 +94,12 @@ public class EmployeeDAO {
         employeesMap.clear();
     }
 
+    private void writeToFile(String fileName, EmployeeDTO employeeDTO) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileName, true));
+        bufferedWriter.write(employeeDTO.toString());
+        bufferedWriter.close();
+    }
+    /*
     public void writeToFile() throws IOException {
         FileWriter fileWriter = new FileWriter("src/main/resources/DuplicateEntries.csv", true);
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
@@ -110,6 +122,8 @@ public class EmployeeDAO {
         }
         bufferedWriter.close();
     }
+
+     */
 
     public void csvToHashMap(String filename) {
         try {
@@ -172,7 +186,7 @@ public class EmployeeDAO {
     public void convertMapToSQL(Map<String, EmployeeDTO> employees) {
         for (Map.Entry<String, EmployeeDTO> set: employees.entrySet()) {
             insertEmployeeRecordDb(Integer.parseInt(
-                    set.getKey())
+                            set.getKey())
                     , set.getValue().getNamePrefix()
                     , set.getValue().getFirstName()
                     , set.getValue().getMiddleInitial()
@@ -185,35 +199,32 @@ public class EmployeeDAO {
         }
     }
 
-    public String retrieveRecordsFromSQL(int emp_ID) {
-        logger.log(Level.FINE, "Retrieving employee id: " + emp_ID + " records from the database");
+    public void retrieveRecordsFromSQL(int emp_ID) {
+        consoleHandler.setLevel(Level.ALL);
+        logger.log(Level.INFO, "Retrieving clean individual records from the database");
         PreparedStatement preparedStatement;
         ResultSet resultSet;
-        String employee = "";
         try {
             preparedStatement = postgresConn.prepareStatement(SQLQueries.SELECT);
             preparedStatement.setInt(1, emp_ID);
             resultSet = preparedStatement.executeQuery();
-            
             System.out.println("\nEmp ID, " + "Name Prefix, " + "First Name, " + "Middle Initial, " + "Last Name,  " + "Gender, " + "E Mail, " + "Date of Birth, " + "Date of Joining, " + "Salary");
             while (resultSet.next()) {
-                employee = resultSet.getString(1) + " "
-                + resultSet.getString(2) + " "
-                + resultSet.getString(3) + " "
-                + resultSet.getString(4) + " "
-                + resultSet.getString(5) + " "
-                + resultSet.getString(6) + " "
-                + resultSet.getString(7) + " "
-                + resultSet.getString(8) + " "
-                + resultSet.getString(9) + " "
-                + resultSet.getString(10);
+                System.out.println(resultSet.getString(1)
+                        + ", " + resultSet.getString(2)
+                        + ", " + resultSet.getString(3)
+                        + ", " + resultSet.getString(4)
+                        + ", " + resultSet.getString(5)
+                        + ", " + resultSet.getString(6)
+                        + ", " + resultSet.getString(7)
+                        + ", " + resultSet.getString(8)
+                        + ", " + resultSet.getString(9)
+                        + ", " + resultSet.getString(10));
             }
             resultSet.close();
             preparedStatement.close();
-            return employee;
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return employee;
     }
 }
